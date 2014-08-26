@@ -1,0 +1,148 @@
+package spellchecker;
+
+import java.io.*;
+import java.util.*;
+
+import org.apache.commons.io.*;
+
+
+public class BasicDictionary implements Dictionary {
+
+    private BinaryTreeNode root;
+    int nodeCount = 0;
+
+    @Override
+    public void importFile(String filename) throws Exception {
+
+        root = null;
+        nodeCount = 0;
+        File textFile = new File(filename);
+        String txtToFile = FileUtils.readFileToString(textFile);
+        txtToFile = txtToFile.toLowerCase();
+
+        String[] words = txtToFile.split("\r\n");
+        Collections.shuffle(Arrays.asList(words));
+
+        for (int i = 0; i <= words.length - 1; i++) {
+            add(words[i]);
+        }
+
+    }
+
+    @Override
+    public void load(String filename) throws Exception {
+        
+        File textFile = new File(filename);
+        String txtToFile = FileUtils.readFileToString(textFile);
+        String[] words = txtToFile.split("\r\n");
+        for (int i = 0; i <= words.length - 1; i++) {
+            add(words[i]);
+        }
+    }
+
+    StringBuilder preOrderedTree = new StringBuilder("");
+
+    
+    public void saveTreePreOrder(BinaryTreeNode root) {
+        if (getRoot() == null) {
+            System.out.println("Nothing to save, the tree is empty.");
+        } else {
+            preOrderedTree.append(root.value);
+            preOrderedTree.append("\r\n");
+            if(root.left!=null){
+            saveTreePreOrder(root.left);
+            }
+            if(root.right!=null){
+            saveTreePreOrder(root.right);
+            }
+        }
+    }
+    
+
+    @Override
+    public void save(String filename) throws Exception {
+        saveTreePreOrder(getRoot());
+        File textFile = new File(filename);
+        FileUtils.writeStringToFile(textFile, preOrderedTree.toString());
+    }
+
+    @Override
+    public String[] find(String word) {
+        int value;
+        BinaryTreeNode tempNode;
+        boolean done = false;
+        if (root == null) {
+            root = new BinaryTreeNode(word);
+            nodeCount++;
+        } else {
+            tempNode = root;
+            while (done == false) {
+                value = word.compareTo(tempNode.value);
+                if (value == 0) {
+                    System.out.println("Found");
+                    done = true;
+                }
+                else{
+                    if (value < 0) {
+                        tempNode = tempNode.left;
+                    }
+                 else if (value > 0) {
+                        tempNode = tempNode.right;
+                    }
+                }
+            }
+            
+            return null;
+        }
+
+    @Override
+    public void add(String word) {
+
+        int value;
+        BinaryTreeNode tempNode;
+        BinaryTreeNode newNode = new BinaryTreeNode(word);
+        boolean inserted = false;
+        if (root == null) {
+            root = new BinaryTreeNode(word);
+            nodeCount++;
+        } else {
+            tempNode = root;
+            while (inserted == false) {
+                value = word.compareTo(tempNode.value);
+                if (value == 0) {
+                    System.out.println("Entry Already Exists");
+                    break;
+                }
+                if (value < 0) {
+                    if (tempNode.left == null) {
+                        tempNode.left = newNode;
+                        nodeCount++;
+                        inserted = true;
+                    } else {
+                        tempNode = tempNode.left;
+                    }
+                } else if (value > 0) {
+                    if (tempNode.right == null) {
+                        tempNode.right = newNode;
+                        nodeCount++;
+                        inserted = true;
+                    } else {
+                        tempNode = tempNode.right;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public BinaryTreeNode getRoot() {
+        return root;
+    }
+
+    @Override
+    public int getCount() {
+        return nodeCount;
+    }
+}
+
+

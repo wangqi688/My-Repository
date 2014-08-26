@@ -1,0 +1,128 @@
+/*Cedric Holz
+ * Coach
+ * 10-17-12
+ * Assignment 7
+ * This program takes in 10 students' grades and finds
+ * their average, then it finds how many grades are above
+ * and below that average. Then it arranges the scores in
+ * ascending order.
+ * If the user wants to put in less than 10 scores they can
+ * put in a negative number to end their input and the
+ * textfield will be uneditable.
+ */
+import java.applet.Applet;
+import java.awt.*;
+import java.awt.event.*;
+
+public class seven extends Applet implements ActionListener {
+
+    Label prompt1;
+    TextField input1;
+    Label prompt2;
+    TextField input2;
+    boolean done;
+    int number;
+    int computeAverage;
+    int aboveAverage;
+    int belowAverage;
+    int[] score = new int[10];
+    int next = 0;
+
+    int computeAverage(int score[], int length) {//computes the average of the 10 scores
+        int total = 0;
+        for (int counter = 0; counter < score.length; counter++)
+            total += score[counter];
+        int average = total / score.length;
+        return average;
+
+    }
+
+    int aboveAverage(int score[], int length) {//counts how many scores are above the averages
+        int average = (computeAverage(score, length));
+        int total = 0;
+        for (int counter = 0; counter < score.length; counter++) {
+            if (score[counter] >= average) {
+                total++;
+            }
+        }
+        {
+            return total;
+        }
+    }
+
+    int belowAverage(int score[], int length) {//counts how many scres are below the average
+        int average = (computeAverage(score, length));
+        int total = 0;
+        for (int i = 0; i < score.length; i++) {
+            if (score[i] < average) {
+                total++;
+            }
+        }
+        {
+            return total;
+        }
+    }
+
+    public void init() {
+        prompt1 = new Label("Enter a Score");
+        add(prompt1);
+        input1 = new TextField(10);
+        input1.addActionListener(this);
+        add(input1);
+
+    }
+
+    public static int[] modifyArray(int[] score) {//copies the array and sorts it making a new sorted array
+        for (int x = 0; x < score.length; x++)
+            for (int y = 0; y < score.length - 1; y++) {
+                int a = score[y];
+                int b = score[y + 1];
+                if (score[y] > score[y + 1]) {
+                    score[y] = b;
+                    score[y + 1] = a;
+                }
+            }
+        return score;
+    }
+
+    public void paint(Graphics g) {//Displays the information on the applet
+        g.drawString("Enter -1 to quit early", 10, 50);
+
+        if (done) {
+            g.drawString(
+                    "The class average is "
+                            + (computeAverage(score, score.length)) + "%", 10, 90);
+            g.drawString(
+                    "The # of scores greater than or equal to the average is "
+                            + aboveAverage(score, score.length), 10, 110);
+            g.drawString("The # of scores less than the average is "
+                    + belowAverage(score, score.length), 10, 130);
+            int[] result = modifyArray(score);
+            for(int i=0; i < result.length; i++ ) {
+                g.drawString((i+1) + " : " + result[i] , (10+(i*40)), 150);
+            }
+
+            
+        }
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        if(number > 100) {
+            showStatus("Scores over 100 are invalid");
+        } 
+        else if (next < 10) {
+            number = Integer.parseInt(input1.getText());//makes the user number character into a binary number
+            if (number >= 0) {
+                score[next++] = number;
+            }
+        }
+        else {
+            done = true;
+            input1.setEditable(false);//sets the textfield as uneditable
+            showStatus("No more scores can be entered");
+        }
+        
+        repaint();
+
+    }
+}

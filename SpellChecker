@@ -1,0 +1,254 @@
+package spellchecker;
+
+import java.io.*;
+import java.util.*;
+
+import org.apache.commons.io.*;
+
+public class BasicDictionary implements Dictionary {
+
+    private BinaryTreeNode root;
+    int nodeCount = 0;
+
+    @Override
+    public void importFile(String filename) throws Exception {
+
+        root = null;
+        nodeCount = 0;
+        File textFile = new File(filename);
+        String txtToFile = FileUtils.readFileToString(textFile);
+        txtToFile = txtToFile.toLowerCase();
+
+        String[] words = txtToFile.split("\r\n");
+        Collections.shuffle(Arrays.asList(words));
+
+        for (int i = 0; i <= words.length - 1; i++) {
+            add(words[i]);
+        }
+
+    }
+
+    @Override
+    public void load(String filename) throws Exception {
+
+        root = null;
+        File textFile = new File(filename);
+        String txtToFile = FileUtils.readFileToString(textFile);
+        String[] words = txtToFile.split("\r\n");
+        for (int i = 0; i <= words.length - 1; i++) {
+            add(words[i]);
+        }
+    }
+
+    StringBuilder preOrderedTree = new StringBuilder("");
+
+    public void saveTreePreOrder(BinaryTreeNode root) {
+        if (getRoot() == null) {
+            System.out.println("Nothing to save, the tree is empty.");
+        } else {
+            preOrderedTree.append(root.value);
+            preOrderedTree.append("\r\n");
+            if (root.left != null) {
+                saveTreePreOrder(root.left);
+            }
+            if (root.right != null) {
+                saveTreePreOrder(root.right);
+            }
+        }
+    }
+
+    @Override
+    public void save(String filename) throws Exception {
+        saveTreePreOrder(getRoot());
+        File textFile = new File(filename);
+        FileUtils.writeStringToFile(textFile, preOrderedTree.toString());
+    }
+
+    @Override
+    public String[] find(String word) {
+        int value;
+        BinaryTreeNode tempNode;
+        boolean done = false;
+        String[] result = new String[2];
+        String startWord;
+        String tempWord;
+        if (root == null) {
+            return null;
+        }
+        tempNode = root;
+        while (done == false) {
+            value = word.compareToIgnoreCase(tempNode.value);
+            startWord = word.toLowerCase().trim();
+            tempWord = tempNode.value.toLowerCase().trim();
+            if (value == 0) {
+                done = true;
+                return null;
+            } else if (value < 0) {
+                if(startWord.equals(tempWord)){
+                    return null;
+                }
+                result[1] = tempNode.value;
+                if (tempNode.left == null) {
+                    done = true;
+                } else {
+                    tempNode = tempNode.left;
+                }
+            } else {  // value > 0
+                if(startWord.equals(tempWord)){
+                    return null;
+                }
+                result[0] = tempNode.value;
+                if (tempNode.right == null) {
+                    done = true;
+                } else {
+                    tempNode = tempNode.right;
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void add(String word) {
+
+        int value;
+        BinaryTreeNode tempNode;
+        BinaryTreeNode newNode = new BinaryTreeNode(word);
+        boolean inserted = false;
+        if (root == null) {
+            root = new BinaryTreeNode(word);
+            nodeCount++;
+        } else {
+            tempNode = root;
+            while (inserted == false) {
+                value = word.compareTo(tempNode.value);
+                if (value == 0) {
+                    System.out.println("Entry Already Exists");
+                    break;
+                }
+                if (value < 0) {
+                    if (tempNode.left == null) {
+                        tempNode.left = newNode;
+                        nodeCount++;
+                        inserted = true;
+                    } else {
+                        tempNode = tempNode.left;
+                    }
+                } else if (value > 0) {
+                    if (tempNode.right == null) {
+                        tempNode.right = newNode;
+                        nodeCount++;
+                        inserted = true;
+                    } else {
+                        tempNode = tempNode.right;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public BinaryTreeNode getRoot() {
+        return root;
+    }
+
+    @Override
+    public int getCount() {
+        return nodeCount;
+    }
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+
+package spellchecker;
+
+import java.io.*;
+import java.util.regex.*;
+
+import org.apache.commons.io.*;
+
+public class BasicSpellChecker implements SpellChecker {
+
+    BasicDictionary d = new BasicDictionary();
+    String fileToCheck = "";
+    String fixedFile = "";
+
+    @Override
+    public void importDictionary(String filename) throws Exception {
+        d.importFile(filename);
+    }
+
+    @Override
+    public void loadDictionary(String filename) throws Exception {
+        d.load(filename);
+    }
+
+    @Override
+    public void saveDictionary(String filename) throws Exception {
+        d.save(filename);
+    }
+
+    @Override
+    public void loadDocument(String filename) throws Exception {
+        File textFile = new File(filename);
+        fileToCheck = FileUtils.readFileToString(textFile);
+    }
+
+    @Override
+    public void saveDocument(String filename) throws Exception {
+        FileUtils.writeStringToFile(new File(filename), fixedFile);
+
+    }
+
+    @Override
+    public String getText() {
+        return fileToCheck;
+    }
+
+    int currentStartIndex;
+    int currentEndIndex = 0;
+
+    @Override
+    public String[] spellCheck(boolean continueFromPrevious) {
+        String[] result = null;
+        Pattern word = Pattern.compile("\\b[\\w|']+\\b");
+
+        if (continueFromPrevious == false) {
+            Matcher aWord = word.matcher(fileToCheck);
+            while (aWord.find()) {
+                String wordInQuestion = aWord.group();
+                if (d.find(wordInQuestion) != null) {
+                    currentStartIndex = aWord.start();
+                    currentEndIndex = aWord.end();
+                    result = new String[4];
+                    result[0] = wordInQuestion;
+                    result[1] = Integer.toString(aWord.start());
+                    result[2] = d.find(wordInQuestion)[0];
+                    result[3] = d.find(wordInQuestion)[1];
+                    for (int i = 0; i < result.length; i++) {
+                        if (result[i] == null) {
+                            result[i] = "";
+                        }
+                    }
+                    return result;
+                }
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public void addWordToDictionary(String word) {
+        d.add(word);
+
+    }
+
+    @Override
+    public void replaceText(int startIndex, int endIndex, String replacementText) {
+
+    }
+
+    public BasicSpellChecker() {
+
+    }
+}

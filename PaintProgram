@@ -1,0 +1,154 @@
+
+/*
+ * Cedric Holz
+ * D5
+ * Robert Dependahl
+ * Paint Program
+ *
+ * This program reads the mouse drag and paints a circle
+ * where the mouse is being dragged on the Applet window.
+ * In ToolBarWindow the radio buttons are placed on the
+ * frame along with a clear button. When a certain radio
+ * button is clicked a string taken from getSelected checkbox
+ * and compared the color strings in the paint method. Depending
+ * on the checkbox, the mouse drag paints a different color.
+ * If you push the clear button it calls super.update and
+ * clears the whole thing.
+ */
+
+import java.applet.Applet;
+import java.awt.*;
+
+
+public class CsPaint extends Applet {
+
+    private int xValue = -10, yValue = -10;
+    Color currentColor;
+    ToolBarWindow t;
+    String c;
+    
+
+    
+
+    public void init() {
+      t = new ToolBarWindow(this); 
+      t.setSize( 550, 70 );
+      t.setVisible( true );
+      currentColor = new Color(0,0,0);
+    }
+
+
+
+      public void paint(Graphics g) {
+            
+            g.drawString("Drag the mouse to draw", 10, 20);
+            
+            c = t.cbg.getSelectedCheckbox().getLabel( );
+            showStatus("Current Color is " + c);
+            if (c.equals("Black")) g.setColor(new Color(0,0,0));
+            if (c.equals("Red")) g.setColor(Color.red);
+            if (c.equals("Magenta")) g.setColor(Color.magenta);
+            if (c.equals("Blue")) g.setColor(Color.blue);
+            if (c.equals("Green")) g.setColor(Color.green);
+            if (c.equals("Yellow")) g.setColor(Color.yellow);
+            g.fillOval(xValue, yValue, 4, 4);
+            resize(300,300);
+      }
+
+      public void update(Graphics g) {
+        paint(g);
+      }
+
+
+      public boolean mouseDrag(Event evtObj, int x, int y) {
+        xValue = x;
+        yValue = y;
+        repaint();
+        return true;
+      }
+    
+    public void clearButton() {
+        Graphics g = this.getGraphics();
+        super.update(g);
+    }
+
+}
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+import java.awt.*;
+import java.awt.event.*;
+
+public class ToolBarWindow extends Frame {
+    private Panel radio;
+    Checkbox black, red, magenta, blue, green, yellow;
+    CheckboxGroup cbg;
+    Button clear;
+    private Color currentColor;
+    private CsPaint paint;
+
+    public ToolBarWindow(CsPaint p) {
+
+        paint = p;
+        cbg = new CheckboxGroup();
+        black = new Checkbox("Black", cbg, true);
+        red = new Checkbox("Red", cbg, false);
+        magenta = new Checkbox("Magenta", cbg, false);
+        blue = new Checkbox("Blue", cbg, false);
+        green = new Checkbox("Green", cbg, false);
+        yellow = new Checkbox("Yellow", cbg, false);
+        clear = new Button("Clear");
+
+        ButtonHandler bh = new ButtonHandler();
+        clear.addActionListener(bh);
+
+        radio = new Panel();
+        radio.setLayout(new GridLayout(1, 10));
+
+        radio.add(black);
+        radio.add(red);
+        radio.add(magenta);
+        radio.add(blue);
+        radio.add(green);
+        radio.add(yellow);
+        radio.add(clear);
+        add(radio, BorderLayout.NORTH);
+
+    }
+
+
+    public Color setCurrentColor() {
+        Color c = new Color(0, 0, 0);
+        if (cbg.getSelectedCheckbox().equals(black))
+            c = Color.black;
+        if (cbg.getSelectedCheckbox().equals(magenta))
+            c = Color.magenta;
+        if (cbg.getSelectedCheckbox().equals(blue))
+            c = Color.blue;
+        if (cbg.getSelectedCheckbox().equals(green))
+            c = Color.green;
+        if (cbg.getSelectedCheckbox().equals(yellow))
+            c = Color.yellow;
+        return c;
+    }
+
+    public Color getCurrentColor() {
+        return currentColor;
+    }
+    
+    private class ButtonHandler implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            paint.clearButton();
+        }
+    }
+}
+
+
+

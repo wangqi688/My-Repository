@@ -1,0 +1,188 @@
+package xmlvalidator;
+
+import java.util.regex.*;
+/*
+Cedric Holz
+XmlValidator
+4/4/2013
+Stephen Strenn
+
+This program takes in an Xml file to check if it's valid.
+ */
+
+
+public class BasicXmlValidator implements XmlValidator {
+
+    public String[] validate(String xmlDocument) {
+
+        String[] result = new String [1];//Creates the string to be returned.
+        BasicStringStack s = new BasicStringStack();//Creates a stack object.
+        String lineByLine[] = xmlDocument.split("\r?\n");//Takes the Xml file and splits each individual line
+        //into a string array.
+
+        Pattern validTag = Pattern.compile("</?([A-Za-z0-9]+?)>");//The regex for valid tags.
+        Pattern startTag = Pattern.compile("<([A-Za-z0-9]+)>");//The regex for valid start tags.
+        Pattern endTag = Pattern.compile("</([A-Za-z0-9]+?)>");//The regex for valid end tags.
+
+        for (int i = 0; i < lineByLine.length; i++) {
+
+            Matcher tagMatcher = validTag.matcher(lineByLine[i]);//Checks each line of the xml file for the valid tag pattern.
+            while (tagMatcher.find()) {//If the patern matches it continues.
+                String matchedTag = tagMatcher.group();//The found tag itself
+                String textInTag = tagMatcher.group(1);//The text in the matched tag.
+                
+                if (startTag.matcher(matchedTag).matches()) {//If it is a start tag, push onto the stack along with the line number.
+                    s.push(textInTag);
+                    s.head.setLineNumber(i + 1);
+                }
+                
+                
+                 if (s.head == null &&endTag.matcher(textInTag).matches()) {
+                     //If the stack is empty and a valid endTag is found return this.
+                           result = new String [3];
+                        result[0] = "Orphan closing tag";
+                        result[1] = textInTag;
+                        result[2] = Integer.toString(i + 2);
+                        return result;
+                    }
+                 
+                    if(s.head == null){//If the stack is empty the xml file is valid so return null.
+                        return null;
+                    }
+
+                
+                else if (endTag.matcher(matchedTag).matches() && s.head.getStoredText().equals(textInTag)) {
+                    s.pop();//If the end tag found is the closing tag to the tag ontop of the stack, pop it off the stack.
+                }
+
+                else if (endTag.matcher(matchedTag).matches() && !s.head.getStoredText().equals(textInTag)) {
+                     result = new String [5];
+                     //If the endTag found isn't the same as the tag ontop of the stack, return this.
+                    result[0] = "Tag mismatch";
+                    result[1] = s.head.getStoredText();
+                    result[2] = Integer.toString(s.head.getLineNumber());
+                    result[3] = textInTag;
+                    result[4] = Integer.toString(i);
+                    return result;
+                }
+            }
+        }
+        
+        if (s.head != null) {
+            //If everything's finished but there's still an open tag ontop, return this.
+            result = new String [3];
+            result[0] = "Unclosed tag at end";
+            result[1] = s.head.getStoredText();
+            result[2] = Integer.toString(s.head.getLineNumber());
+            return result;
+        }
+        return result;
+        }
+    }
+
+
+
+---------------------------------------------------------------------------------------------------------------------------
+
+
+package xmlvalidator;
+
+public class StackNode {
+    
+    private String storedText;
+    private int lineNumber;
+    StackNode prev;
+    StackNode next;
+
+    public StackNode() {
+    }
+
+    public StackNode(String storedText, StackNode next) {
+        this.storedText = storedText;
+        this.next = next;
+    }
+
+    public String getStoredText() {
+        return storedText;
+    }
+    
+    public int getLineNumber(){
+        return lineNumber;
+    }
+
+    public void setStoredText(String storedText) {
+        this.storedText = storedText;
+    }
+    
+    public void setLineNumber(int line){
+        this.lineNumber = line;
+    }
+
+    public StackNode(String storedText) {
+        this(storedText, null);
+    }
+
+}
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
+
+package xmlvalidator;
+
+public class BasicStringStack implements StringStack {
+
+    StackNode head;
+    int nodeCount = 0;
+    StackNode tempNode;
+
+    public void push(String item) {//Takes a string and puts it on top of the stack.
+        StackNode newText = new StackNode(item);
+        if (head == null) {
+            head = newText;
+        } else {
+            tempNode = head;
+            head = newText;
+            head.next = tempNode;
+        }
+        nodeCount++;
+    }
+
+    @Override
+    public String pop() {//Takes a node off of the top of the stack.
+        if (head == null)
+            return null;
+
+        else {
+            tempNode = head;
+            head = head.next;
+            nodeCount--;
+            return tempNode.getStoredText();
+        }
+
+    }
+
+    @Override
+    public String peek(int position) {//Searches the stack based on position.
+        tempNode = head;
+        if (position > nodeCount-1) {
+            System.out.println("There are only" + nodeCount + "Nodes in the Stack");
+        }
+            if (position == 0) {
+                return head.getStoredText();
+            } else {
+                for (int i = 0; i < position; i++) {
+                    tempNode = tempNode.next;
+                }
+                return tempNode.getStoredText();
+            }
+        }
+
+    @Override
+    public int getCount() {//Returns how many nodes are in the stack.
+        return nodeCount;
+    }
+
+}
+
+

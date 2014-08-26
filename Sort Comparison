@@ -1,0 +1,138 @@
+/*
+ * Cedric Holz
+ * Java 145
+ * 05/16/13
+ * Stephen Strenn
+ * SortComparison
+ */
+
+package sortcomparison;
+
+public class BasicSorter implements Sorter {
+
+    @Override
+    public void insertionSort(String[] data, int firstIndex, int numberToSort) {
+        int j;
+        for(int i = 0; i < data.length; i++){//iterates through the array from left to right
+            j = i;
+            while(j > 0 && data[j].compareToIgnoreCase(data[j - 1]) < 0){//iterates through the list right to left
+                swap(data,j,j-1);
+                j--;}
+        }
+    }
+        
+
+    @Override
+    public void quickSort(String[] data, int firstIndex, int numberToSort) {
+        if (numberToSort <= 15) {//use insertion on small amounts of data
+            insertionSort(data, firstIndex, numberToSort);
+        } else {
+            if (numberToSort - 1 > firstIndex) {
+                int q = partition(data, firstIndex, numberToSort);//pass in data and get tooSmallIndex
+                quickSort(data, firstIndex, q);//Sort the left
+                quickSort(data, q + 1, numberToSort - q - 1);//Sort the right
+            }
+        }
+    }
+
+    @Override
+    public int partition(String[] data, int firstIndex, int numberToPartition) {
+        String pivot = medianOfThree(data, firstIndex, numberToPartition - 1);//Find the median of the first middle and last elements
+        int tooBig = firstIndex + 1;//Start after pivot
+        int tooSmall = firstIndex + numberToPartition - 1;//Start with last element
+
+        while (tooBig < tooSmall) {//until tooBig gets to toosmall, do
+
+            while (tooBig < tooSmall && data[tooBig].compareToIgnoreCase(pivot) <= 0) {//if toobig < toosmall && tooBig<=pivot, move tooBig forward.
+                tooBig++;
+            }
+            while (tooSmall > firstIndex && data[tooSmall].compareToIgnoreCase(pivot) > 0) {//if tooSmall < first && tooSmall > pivot
+                tooSmall--;
+            }
+            if (tooBig < tooSmall) {//swap tooBig and tooSmall if tooBig is less than tooSmall
+                swap(data,tooBig,tooSmall);
+            }
+        }
+        if (pivot.compareToIgnoreCase(data[tooSmall]) >= 0) {//if pivot  >= tooSmall, swap tooSmall and pivot
+            swap(data,firstIndex,tooSmall);
+            return tooSmall;
+        } else {
+            return firstIndex;
+        }
+    }
+
+    public void swap(String[] data, int index1, int index2) {//Basic swap function
+        String tempString = data[index1];
+        data[index1] = data[index2];
+        data[index2] = tempString;
+    }
+
+    public String medianOfThree(String[] data, int firstIndex, int lastIndex) {//Finds the median of the first, middle and last elements.
+        int middleIndex = (firstIndex+lastIndex) / 2;
+
+        if (data[firstIndex].compareToIgnoreCase(data[middleIndex]) > 0) {
+            if (data[middleIndex].compareTo(data[lastIndex]) > 0) {
+                String tempString = data[firstIndex];
+                data[firstIndex]=data[middleIndex];
+                data[middleIndex]=tempString;
+                return data[firstIndex];
+            } else if (data[firstIndex].compareTo(data[lastIndex]) > 0) {
+                String tempString = data[firstIndex];
+                data[firstIndex]=data[lastIndex];
+                data[lastIndex]=tempString;
+                return data[firstIndex];
+            } else {
+                return data[firstIndex];
+            }
+        } else {
+            if (data[firstIndex].compareTo(data[lastIndex]) > 0) {
+                return data[firstIndex];
+            } else if (data[middleIndex].compareTo(data[lastIndex]) > 0) {
+                String tempString = data[firstIndex];
+                data[firstIndex]=data[lastIndex];
+                data[lastIndex]=tempString;
+                return data[firstIndex];
+            } else {
+                String tempString = data[firstIndex];
+                data[firstIndex]=data[middleIndex];
+                data[middleIndex]=tempString;
+                return data[firstIndex];
+            }
+        }
+    }
+
+    @Override
+    public void mergeSort(String[] data, int firstIndex, int numberToSort) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void merge(String[] data, int firstIndex, int leftSegmentSize, int rightSegmentSize) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void heapSort(String[] data) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void heapify(String[] data) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+
+    }
+
+}
+
+

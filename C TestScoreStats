@@ -1,0 +1,64 @@
+/*
+ ============================================================================
+ Name        : CHolzTestScoreStats.c
+ Author      : Cedric Holz
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+char buffer[BUFSIZ + 1];
+float result = 0;
+float max = 0;
+float min = 0;
+int numberTests = 0;
+float sum = 0;
+float average = 0;
+float standardDeviation = 0;
+float sumSquares = 0;
+
+int main(void) {
+	setvbuf(stdout, NULL, _IONBF, 0);
+	printf("Enter a scores and press <ENTER> \n");
+
+	do {
+		result = atof(fgets(buffer, BUFSIZ, stdin));
+		if(buffer[0] == '\n')
+			break;
+
+		if (numberTests == 0) {
+			min = result;
+		}
+
+		if (numberTests > 0 && result < min) {
+			min = result;
+		}
+
+		if (result > max) {
+			max = result;
+		}
+		numberTests = numberTests + 1;
+		sum += result;
+		sumSquares += result * result;
+	} while (buffer[0] != '\n');
+
+	if(numberTests == 0){
+		printf("%d\t%d\t%d\t%d\t%d\t\n",0, 0, 0, 0, 0);
+
+	}
+	else{
+	average = (sum / numberTests);
+	standardDeviation = sqrt((sumSquares - (sum * sum) / numberTests) / numberTests);
+
+	printf("%d\t%f\t%f\t%f\t%f\t\n",numberTests, min, max, average, standardDeviation);
+	}
+
+	//printf("%d is the result \n", result);
+	return EXIT_SUCCESS;
+}
+

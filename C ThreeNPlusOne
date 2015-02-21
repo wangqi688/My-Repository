@@ -1,0 +1,75 @@
+/*
+ ============================================================================
+ Name        : CHolzThreeNPlusOne.c
+ Author      : Cedric Holz
+ Version     :
+ Copyright   : Your copyright notice
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+FILE *pInFile;
+FILE *pOutFile;
+int computeMaxSequenceLength(int, int);
+int computeSequenceLength(int);
+int computeNextValue(int);
+int n = 0;
+int maxLength = 0;
+
+int main(void) {
+	setvbuf(stdout, NULL, _IONBF, 0);
+	char buffer[BUFSIZ + 1];
+	char outPutFile[BUFSIZ + 1] = "";
+	int first, last;
+
+//Prompts for filename and seed values.
+	printf("Enter the output filename:\n");
+	gets(outPutFile);
+	pOutFile = fopen(outPutFile, "w");
+
+//While enter isn't pressed on a new line, it waits for more data.
+	while (buffer[0] != '\n') {
+		first = atoi(fgets(buffer, BUFSIZ, stdin));
+		if (buffer[0] == '\n')
+			break;
+		last = atoi(fgets(buffer, BUFSIZ, stdin));
+		fprintf(pOutFile, "%d\t%d\t%d\n", first, last,
+				computeMaxSequenceLength(first, last));
+	}
+	printf("Complete\n");
+	return EXIT_SUCCESS;
+}
+
+//Divides n by 2 if even and multiplies by three adds one if n is odd
+int computeNextValue(int n) {
+	if (n % 2 == 0) {
+		n = n / 2;
+	} else {
+		n = 3 * n + 1;
+	}
+	return n;
+}
+
+//Finds length of each number within the range.
+int computeSequenceLength(int n) {
+	int length = 1;
+	while (n != 1) {
+		length++;
+		n = computeNextValue(n);
+	}
+	return length;
+}
+
+//Cycles through each number and finds the number with the longest length to zero.
+int computeMaxSequenceLength(int firstVal, int lastVal) {
+	int i, length, maxLength = 0;
+	for (i = firstVal; i <= lastVal; i++) {
+		length = computeSequenceLength(i);
+		if (length > maxLength)
+			maxLength = length;
+	}
+	return maxLength;
+}
+

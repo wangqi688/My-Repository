@@ -1,0 +1,535 @@
+/*Cedric Holz
+ * D5
+ * Robert Dependahl
+ * 12/5/12
+ * This program displays an image, takes
+ * in the name of the user, then displays a
+ * scrambled background image and
+ * random pieces of a single image are
+ * cycled through when the user clicks
+ * a on each image. The user can click
+ * the thinking music button in the frame
+ * to hear the jeopardy theme song while they
+ * unscramble it. Once the image is
+ * complete a password is revealed and the
+ * user can input it in the control box leading to
+ * another image which has a quiz. The frame buttons 
+ * change and the user can input their answers into
+ * the frame. Once it is complete, check boxes or red
+ * X's will appear next to the right or wrong answers
+ * respectively and the answers will appear on the bottom.
+ * The frame will change again with a button for my final
+ * project which is 28 images I created in mspaint that
+ * cycle through to create an animation.
+ */
+
+
+import java.applet.Applet;
+import java.applet.AudioClip;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class MyGame extends Applet implements ActionListener {
+	private Image titleScreen;
+	private Image startpage;
+	private Image initialbackground;
+	private Image correct;
+	private Image incorrect;
+	private Image[] coaches = new Image[6];
+	private Image pagetwo;
+	private Image blankpage;
+	private Image ringgirl [];
+
+	AudioClip shakeshakeshake;
+	AudioClip jeopardy;
+	AudioClip ohno;
+	
+	AudioClip mariohs;
+
+	long seed = System.nanoTime();
+	Random r = new Random(seed);
+	ToolBarWindow t;
+
+	int x = 0;
+	int y = 0;
+	int score = 0;
+	int shutupmario = 0;
+	
+	private int totalImages=28,
+			    currentImage = 0,
+	            sleepTime = 100;
+	
+	MediaTracker imageTracker;
+	Timer myTimer;
+	
+
+	String playerName = "";
+	String password = "";
+	String secondQA = "";
+	String cb1 = "";
+	String cb2 = "";
+
+	TextField enterName;
+
+	boolean SP = true;
+	boolean BG;
+	boolean P1 = true, P2 = true, P3 = true, P4 = true, P5 = true, P6 = true;
+	boolean Pass = false;
+	boolean quiz;
+	boolean A1 = false;
+	boolean A2 = false;
+	boolean A3 = false;
+	boolean thirdpage = false;
+	boolean doublecheckerthingthatsomehowfixesitidontunderstandwhy = false;
+	boolean startAnimation = false;
+
+	public void loadImage() {
+		try {
+			startpage = getImage(getDocumentBase(), "startpage.jpg");
+			initialbackground = getImage(getDocumentBase(),
+					"initialbackground.jpg");
+			pagetwo = getImage(getDocumentBase(), "pagetwo.jpg");
+			correct = getImage(getDocumentBase(), "correct.jpg");
+			incorrect = getImage(getDocumentBase(), "incorrect.jpg");
+			blankpage = getImage(getDocumentBase(), "blankpage.jpg");
+
+			coaches[0] = getImage(getDocumentBase(), "coachpart1.jpg");
+			coaches[1] = getImage(getDocumentBase(), "coachpart2.jpg");
+			coaches[2] = getImage(getDocumentBase(), "coachpart3.jpg");
+			coaches[3] = getImage(getDocumentBase(), "coachpart4.jpg");
+			coaches[4] = getImage(getDocumentBase(), "coachpart5.jpg");
+			coaches[5] = getImage(getDocumentBase(), "coachpart6.jpg");
+
+			for (int i = 0; i < coaches.length; i++) {
+				int x = r.nextInt(coaches.length - i) + i;
+				Image temp = coaches[i];
+				coaches[i] = coaches[x];
+				coaches[x] = temp;
+			}
+
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	public void loadRingGirl(){//my animation made into a method so I can just call
+		//it when I see fit/
+		
+		myTimer = new Timer(true);
+	      myTimer.schedule(
+	                  new TimerTask ( ){    
+	                          public void run( ) {
+	                                                           repaint( );
+	                                                        }
+	                                       }
+	                  ,0, sleepTime);
+
+	      ringgirl = new Image[ totalImages ];
+	      imageTracker = new MediaTracker( this );
+	      for ( int i = 0; i < ringgirl.length; i++ ) {
+	    	  ringgirl[ i ] = getImage( getDocumentBase(),
+	            "ring" + (i+1) + ".jpg" );
+
+
+	         imageTracker.addImage( ringgirl[ i ], i );
+	      }
+
+	      try {
+	         imageTracker.waitForID( 0 ); } catch( InterruptedException e ) { }
+	   }
+	
+	
+
+	public void init() {//sets everything at the beginning
+		enterName = new TextField("Enter your name", 20);
+		enterName.addActionListener(this);
+		add(enterName);
+
+		addMouseListener(new mymouselistener());
+
+		jeopardy = getAudioClip(getDocumentBase(), "jeopardy.au");
+		mariohs = getAudioClip(getDocumentBase(), "mariohs.au");
+		shakeshakeshake = getAudioClip(getDocumentBase(), "shakeshakeshake.au");
+		ohno = getAudioClip(getDocumentBase(), "ohno.au");
+		ohno.play();
+		
+
+		t = new ToolBarWindow("Control Box");//creates a toolbarwindow object
+		t.setSize(400, 100);//changes the size to fit what I needd.
+		t.pushpush.addActionListener(this);//buttons use the Actionlistener in the
+		//main class
+		t.gradeMe.addActionListener(this);
+		t.passfield.addActionListener(this);
+		t.lotro.addActionListener(this);
+		t.finish.addActionListener(this);
+	}
+		
+
+	public void start() {
+	}
+
+	public class mymouselistener extends MouseAdapter {//Gets the mouse clicks creating
+		//X and Y values for each click.
+
+		public void mouseClicked(MouseEvent e) {
+			x = e.getX();
+			y = e.getY();
+			repaint();
+
+		}
+	}
+
+	public void actionPerformed(ActionEvent e) {
+
+		playerName = enterName.getText();
+		showStatus("Sweet name, " + playerName + ".");//shows a status
+		SP = false;
+		BG = true;
+		enterName.setVisible(false);
+
+		password = t.passfield.getText();
+		secondQA = t.lotro.getText();
+
+		if (e.getSource() == t.pushpush) {//sees if the user has clicked a button in
+			//the frame
+			jeopardy.play();
+		}
+
+		if (e.getSource() == t.gradeMe) {
+			quiz = true;
+			t.passfield.setVisible(false);
+		}
+
+		if (e.getSource() == t.finish) {
+			thirdpage = true;
+			doublecheckerthingthatsomehowfixesitidontunderstandwhy = true;
+			//It wasn't working so I made two booleans and it fixed it
+			//I don't really know why. Pretty much just slapped some duct tape
+			//on it and called it good.
+			quiz = false;
+			password = "";
+			t.Prompt1.setVisible(false);
+			t.Prompt2.setVisible(false);
+			t.Prompt3.setVisible(false);
+
+			t.lotro.setVisible(false);
+
+			t.Yes1.setVisible(false);
+			t.No1.setVisible(false);
+
+			t.Yes2.setVisible(false);
+			t.No2.setVisible(false);
+
+			t.gradeMe.setVisible(false);
+			t.finish.setVisible(true);
+			
+
+			loadRingGirl();
+			shakeshakeshake.play();
+			
+			showStatus("My Final!");
+
+		}
+
+		repaint();
+	}
+
+	public void paint(Graphics g) {
+
+		Font f = new Font("Sans", Font.BOLD, 50);//creates a font
+		Font f1 = new Font("Sans", Font.PLAIN, 21);
+
+		if (thirdpage = true && doublecheckerthingthatsomehowfixesitidontunderstandwhy == true) {
+
+			g.drawImage(ringgirl[currentImage], 0, 0, this);
+		   	 try {
+		   		 Thread.sleep(10);
+		   	 } catch (InterruptedException e) {
+		   	 }
+	         currentImage = ++currentImage % totalImages;
+			
+		}
+
+		if (password.equalsIgnoreCase("Java")) {
+			t.passfield.setVisible(false);
+			t.pushpush.setVisible(false);
+			Pass = true;
+			jeopardy.stop();
+			if (shutupmario < 1) {
+				mariohs.play();
+				shutupmario++;
+			}
+			showStatus("");
+
+			t.resize(200, 300);
+
+			t.Prompt1.setVisible(true);
+			t.Prompt2.setVisible(true);
+			t.Prompt3.setVisible(true);
+
+			t.lotro.setVisible(true);
+
+			t.Yes1.setVisible(true);
+			t.No1.setVisible(true);
+
+			t.Yes2.setVisible(true);
+			t.No2.setVisible(true);
+
+			t.gradeMe.setVisible(true);
+
+			g.setFont(f);
+			g.drawImage(pagetwo, 0, 0, this);
+			g.drawString(playerName, 320, 107);
+
+			P1 = false;
+			P2 = false;
+			P3 = false;
+			P4 = false;
+			P5 = false;
+			P6 = false;
+
+		}
+
+		if (quiz == true) {//if it's quiz time this changes the visibility of the
+		//objects in the frame and gets ready to accept the user's answers.
+
+			g.setFont(f1);//sets the font
+			g.setColor(Color.white);
+
+			cb1 = t.YN1.getSelectedCheckbox().getLabel();//makes a string of the 
+			//radio buttons for a later comparison.
+			cb2 = t.YN2.getSelectedCheckbox().getLabel();
+
+			if (cb1.equals("No")) {//compares the string to get the user's answer.
+				g.drawImage(correct, 700, 340, this);
+				g.drawString(
+						"Answer 1: Right! Our textbook is actually written in Ancient Greek.",
+						10, 530);
+				score++;
+			} else if (cb1.equals("Yes")) {
+				g.drawImage(incorrect, 700, 340, this);
+				g.drawString(
+						"Answer 1: Wrong! Our textbook is actually written in Ancient Greek.",
+						10, 530);
+			}
+
+			if (secondQA.equalsIgnoreCase("lotro")) {
+				g.drawImage(correct, 700, 415, this);
+				g.drawString(
+						"Answer 2: Right! LOTRO, he's apparently got some pretty sweet armor.",
+						10, 560);
+				score++;
+			} else {
+				g.drawImage(incorrect, 700, 415, this);
+				g.drawString(
+						"Answer 2: Wrong! LOTRO, he's apparently got some pretty sweet armor.",
+						10, 560);
+			}
+
+			if (cb2.equals("Yes")) {
+
+				g.drawImage(correct, 700, 490, this);
+				g.drawString("Answer 3: AAAWWWWWW YYYEEEAAAA!", 10, 590);
+				score++;
+			}
+
+			Font f2 = new Font("Sans", Font.PLAIN, 60);
+			g.setColor(Color.blue);
+			g.setFont(f2);
+			g.drawString(score / 2 + "/3", 625, 290);
+
+			t.Prompt1.setVisible(false);
+			t.Prompt2.setVisible(false);
+			t.Prompt3.setVisible(false);
+
+			t.lotro.setVisible(false);
+
+			t.Yes1.setVisible(false);
+			t.No1.setVisible(false);
+
+			t.Yes2.setVisible(false);
+			t.No2.setVisible(false);
+
+			t.gradeMe.setVisible(false);
+			t.finish.setVisible(true);
+
+			t.resize(100, 70);
+		}
+
+		if (SP == true && Pass == false) {//if the start page is up and no pass
+			//word has been entered show my first image.
+			loadImage();
+			g.drawImage(startpage, 0, 0, this);
+		}
+
+		if (BG == true && Pass == false) {//background mixed by me so the answer
+			//isn't revealed at the beginning by chance.
+			g.drawImage(initialbackground, 0, 0, this);
+		}
+
+		if (SP == false && P1 == true && (x > 0) && (x <= 393) && (y > 0)
+				&& (y <= 203))
+		//Checks to see if the mouse has been clicked in the first box.
+			//if it is then display on the of 6 images here randomly.
+			{
+			loadImage();
+			BG = false;
+			g.drawImage(coaches[0], 0, 0, this);
+		}
+
+		if (SP == false && P2 == true && (x > 393) && (x <= 768) && (y > 0)
+				&& (y <= 203)) {
+			loadImage();
+			BG = false;
+			g.drawImage(coaches[1], 393, 0, this);
+		}
+
+		if (SP == false && P3 == true && (x > 0) && (x <= 393) && (y > 203)
+				&& (y <= 406)) {
+			loadImage();
+			BG = false;
+			g.drawImage(coaches[2], 0, 203, this);
+		}
+
+		if (SP == false && P4 == true && (x > 393) && (x <= 768) && (y > 203)
+				&& (y <= 406)) {
+			loadImage();
+			BG = false;
+			g.drawImage(coaches[3], 393, 203, this);
+		}
+
+		if (SP == false && P5 == true && (x > 0) && (x <= 393) && (y > 406)
+				&& (y <= 609)) {
+			loadImage();
+			BG = false;
+			g.drawImage(coaches[4], 0, 406, this);
+		}
+
+		if (SP == false && P6 == true && (x > 393) && (x <= 768) && (y > 406)
+				&& (y <= 609)) {
+			loadImage();
+			BG = false;
+			g.drawImage(coaches[5], 393, 406, this);
+
+		}
+
+		resize(786, 609);
+
+	}
+
+	public void update(Graphics g) {
+		paint(g);//gets rid of the flashing white bad animation stuff.
+	}
+
+}
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+import java.awt.Button;
+import java.awt.Checkbox;
+import java.awt.CheckboxGroup;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Label;
+import java.awt.TextField;
+
+
+
+public class ToolBarWindow extends Frame{
+	
+
+	TextField passfield;
+	TextField lotro;
+	Button pushpush;
+	Button gradeMe;
+	Button finish;
+	Label Prompt1;
+	Label Prompt2;
+	Label Prompt3;
+	
+	CheckboxGroup YN1,YN2;
+	Checkbox Yes1, No1, Yes2, No2;
+			 
+	        ToolBarWindow(String title){//creating the frame
+	        	
+	        	    super();
+	        		
+	        		YN1 = new CheckboxGroup();
+	        		YN2 = new CheckboxGroup();
+	                
+	                setLayout(new FlowLayout(1,100,1));
+
+	                this.setVisible(true);
+
+
+	                pushpush = new Button("Click for thinking music");//making buttons
+	                add(pushpush);//adding buttons
+	                
+	                passfield = new TextField("Enter Password", 20);
+	                add(passfield);
+	              
+	                
+	                Prompt1 = new Label("Question 1");
+	                add(Prompt1);
+	                Prompt1.setVisible(false);//setting invisible so it will only appear
+	                //when I want it to.
+	                
+	                Yes1 = new Checkbox("Yes",YN1,false);
+	                No1 = new Checkbox("No",YN1,false);
+	                add(Yes1);
+	                Yes1.setVisible(false);
+	                add(No1);
+	                No1.setVisible(false);
+	                
+	                lotro = new TextField(10);
+	                Prompt2 = new Label("Question 2");
+	                add(Prompt2);
+	                add(lotro);
+	                lotro.setVisible(false);
+	                Prompt2.setVisible(false);
+	                
+	                
+	                Prompt3 = new Label("Question 3");
+	                add(Prompt3);
+	                Prompt3.setVisible(false);
+	                
+	                Yes2 = new Checkbox("Yes",YN2,false);//creates a checkbox
+	                No2 = new Checkbox("No",YN2,false);
+	                add(Yes2);
+	                Yes2.setVisible(false);
+	                add(No2);
+	                No2.setVisible(false);
+	                No2.setEnabled(false);
+	                
+	                gradeMe = new Button("Grade Me!");
+	                add(gradeMe);
+	                gradeMe.setVisible(false);
+	                
+	                finish = new Button("Click for Final");
+	                add(finish);
+	                finish.setVisible(false);
+	                
+	                
+	                
+	                
+	                
+	                
+
+	                
+
+	        }
+	        
+}
+
+
+

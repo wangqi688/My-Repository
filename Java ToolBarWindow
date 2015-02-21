@@ -1,0 +1,94 @@
+import java.awt.Button;
+import java.awt.Checkbox;
+import java.awt.CheckboxGroup;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Label;
+import java.awt.TextField;
+
+
+
+public class ToolBarWindow extends Frame{
+	
+
+	TextField passfield;
+	TextField lotro;
+	Button pushpush;
+	Button gradeMe;
+	Button finish;
+	Label Prompt1;
+	Label Prompt2;
+	Label Prompt3;
+	
+	CheckboxGroup YN1,YN2;
+	Checkbox Yes1, No1, Yes2, No2;
+			 
+	        ToolBarWindow(String title){
+	        	
+	        	    super();
+	        		
+	        		YN1 = new CheckboxGroup();
+	        		YN2 = new CheckboxGroup();
+	                
+	                setLayout(new FlowLayout(1,100,1));
+
+	                this.setVisible(true);
+
+
+	                pushpush = new Button("Click for thinking music");
+	                add(pushpush);
+	                
+	                passfield = new TextField("Enter Password", 20);
+	                add(passfield);
+	              
+	                
+	                Prompt1 = new Label("Question 1");
+	                add(Prompt1);
+	                Prompt1.setVisible(false);
+	                
+	                Yes1 = new Checkbox("Yes",YN1,false);
+	                No1 = new Checkbox("No",YN1,false);
+	                add(Yes1);
+	                Yes1.setVisible(false);
+	                add(No1);
+	                No1.setVisible(false);
+	                
+	                lotro = new TextField(10);
+	                Prompt2 = new Label("Question 2");
+	                add(Prompt2);
+	                add(lotro);
+	                lotro.setVisible(false);
+	                Prompt2.setVisible(false);
+	                
+	                
+	                Prompt3 = new Label("Question 3");
+	                add(Prompt3);
+	                Prompt3.setVisible(false);
+	                
+	                Yes2 = new Checkbox("Yes",YN2,false);
+	                No2 = new Checkbox("No",YN2,false);
+	                add(Yes2);
+	                Yes2.setVisible(false);
+	                add(No2);
+	                No2.setVisible(false);
+	                No2.setEnabled(false);
+	                
+	                gradeMe = new Button("Grade Me!");
+	                add(gradeMe);
+	                gradeMe.setVisible(false);
+	                
+	                finish = new Button("Click for Final");
+	                add(finish);
+	                finish.setVisible(false);
+	                
+	                
+	                
+	                
+	                
+	                
+
+	                
+
+	        }
+	        
+}

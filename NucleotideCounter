@@ -1,0 +1,71 @@
+/*
+ ============================================================================
+ Name        : CHolzNucleotideCounter.c
+ Author      : Cedric Holz
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+FILE *pInFile;
+FILE *pOutFile;
+
+int main(void) {
+
+	setvbuf(stdout, NULL, _IONBF, 0);
+	char inputFile[BUFSIZ + 1] = "";
+	char outPutFile[BUFSIZ + 1] = "";
+	char nextChar;
+	int numA;
+	int numC;
+	int numG;
+	int numT;
+
+	printf("Enter input filename\n");
+	gets(inputFile);
+
+	printf("Enter output filename\n");
+	gets(outPutFile);
+
+	pInFile = fopen(inputFile, "r");
+	pOutFile = fopen(outPutFile, "w");
+
+	while (!feof(pInFile)) {
+
+		nextChar = fgetc(pInFile);
+
+		switch (nextChar) {
+		case 'A':
+			numA++;
+			break;
+		case 'C':
+			numC++;
+			break;
+		case 'G':
+			numG++;
+			break;
+		case 'T':
+			numT++;
+			break;
+		case '\n':
+			fprintf(pOutFile, "%d %d %d %d\n", numA, numC, numG, numT);
+			numA = 0;
+			numC = 0;
+			numG = 0;
+			numT = 0;
+			break;
+		default:
+			break;
+
+		}
+	}
+	fprintf(pOutFile, "%d %d %d %d\n", numA, numC, numG, numT);
+	fclose(pInFile);
+	fclose(pOutFile);
+	printf("Complete\n");
+}
+

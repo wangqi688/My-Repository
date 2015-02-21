@@ -1,0 +1,238 @@
+package addressbook;
+
+import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import org.w3c.dom.*;
+
+import edu.sbcc.cs123.webutils.*;
+
+public class AddressBook implements ContactList {
+
+	ContactNode head;
+	ContactNode tail;
+	ContactNode currentContact;
+	int contactCount = 0;
+	ContactNode tempContact;
+	static  Contact emptyContact = new Contact ("The List is Empty", "The List is Empty", "The List is Empty", "The List is Empty");
+	 ContactNode emptyNode = new ContactNode (emptyContact);
+
+	public AddressBook() {
+	}
+
+	@Override
+	public Contact getCurrent() {
+		if(contactCount == 0){
+			return emptyContact;
+		}
+		return currentContact.getStoredContact();
+	}
+
+	@Override
+	public Contact goFirst() {
+		currentContact = head;
+		return null;
+	}
+
+	@Override
+	public Contact goLast() {
+		currentContact = tail;
+		return null;
+	}
+
+	@Override
+	public Contact goNext() {
+		currentContact = currentContact.next;
+		return null;
+	}
+
+	@Override
+	public Contact goPrevious() {
+		currentContact = currentContact.prev;
+		return null;
+	}
+
+	@Override
+	public int getCount() {
+		return contactCount;
+	}
+
+	@Override
+	public void loadFile(String filename) throws Exception {
+		for (int i = 0; i<contactCount;i++){
+			delete();
+		}
+		Document doc = XmlUtil.getDocument(filename); 
+		 String[] lastName = XmlUtil. selectNodesAsStringArray(doc, "contacts/contact/last"); 
+		 String[] firstName = XmlUtil. selectNodesAsStringArray(doc, "contacts/contact/first"); 
+		 String[] phoneNumber = XmlUtil. selectNodesAsStringArray(doc, "contacts/contact/phone"); 
+		 String[] email = XmlUtil. selectNodesAsStringArray(doc, "contacts/contact/email"); 
+		 
+		 for (int i = 0; i<lastName.length;i++){
+				insert(new Contact(lastName[i], firstName[i], phoneNumber[i], email[i]));
+		 }
+	}
+
+	@Override
+	public void saveFile(String filename) throws Exception {
+		
+		 Document document = XmlUtil.getDocument(filename); 
+		 String[] titles = XmlUtil. selectNodesAsStringArray(document, "contacts/contact/title");
+		 Element contacts = document.getDocumentElement();
+		 Element contact = XmlUtil.addChild(contacts, "contact");
+		 
+		 for (int i = 0; i<contactCount;i++){
+		 XmlUtil.addChild(contact, "last" , getCurrent().getLastName()  + new Date().toString());
+		 XmlUtil.addChild(contact, "first" , getCurrent().getFirstName()  + new Date().toString());
+		 XmlUtil.addChild(contact, "phone" , getCurrent().getPhoneNumber()  + new Date().toString());
+		 XmlUtil.addChild(contact, "email" , getCurrent().getEmail()  + new Date().toString());
+		 goNext();
+		 }
+		 
+		 
+		 XmlUtil.writeToFile(document, openFileOutput(filename+".xml", MODE_PRIVATE));
+
+	}
+
+	@Override
+	public void insert(Contact contact) {
+		ContactNode newContact = new ContactNode(contact);
+		if(getCurrent() == emptyContact){
+			head = newContact;
+			tail = newContact;
+			currentContact = head;
+		}
+		if (head == null) {
+			head = newContact;
+			tail = newContact;
+			currentContact = head;
+		}
+		if (currentContact == head && head == tail) {
+			tail = newContact;
+			head.next = tail;
+			head.prev = tail;
+			tail.prev = head;
+			tail.next = head;
+			currentContact = tail;
+		} else if (currentContact == tail) {
+			tail.next = newContact;
+			newContact.prev = tail;
+			tail = newContact;
+			currentContact = tail;
+			tail.next = head;
+			head.prev = tail;
+
+		} else {
+			newContact.next = currentContact.next;
+			newContact.prev = currentContact;
+			currentContact.next.prev = newContact;
+			currentContact.next = newContact;
+			currentContact = newContact;
+		}
+
+		contactCount++;
+	}
+
+	@Override
+	public void insertBeforeFirst(Contact contact) {
+		ContactNode newContact = new ContactNode(contact);
+		if (head == null) {
+			head = newContact;
+			tail = newContact;
+			currentContact = head;
+		}
+		if (head == tail) {
+			head = newContact;
+			head.next = tail;
+			head.prev = tail;
+			tail.prev = head;
+			tail.next = head;
+			currentContact = head;
+		} else {
+			head.prev = newContact;
+			newContact.next = head;
+			newContact.prev = tail;
+			tail.next = newContact;
+			head = newContact;
+			currentContact = head;
+		}
+		contactCount++;
+	}
+
+	@Override
+	public void delete() {
+
+		if (contactCount - 1 < 0) {
+			contactCount = 0;
+			currentContact = null;
+			System.out.println("The list is empty, stop trying to delete stuff.'");
+		}
+
+		else if (currentContact != null) {
+
+			if (head == tail) {
+				head = null;
+				tail = null;
+				currentContact = null;
+			} else if (currentContact == head) {
+				currentContact = head.next;
+				head.next = null;
+				head.prev=null;
+				currentContact.prev = tail;
+				tail.next=currentContact;
+				head = currentContact;
+			} else if (currentContact == tail) {
+				tail.prev.next = head;
+				head.prev = tail.prev;
+				tail.next = null;
+				tail.prev = null;
+				tail = head.prev;
+				currentContact = head;
+			} else {
+				currentContact = currentContact.next;
+				currentContact.prev = currentContact.prev.prev;
+				currentContact.prev.prev.next = currentContact;
+				currentContact.prev.prev = null;
+				currentContact.prev.next = null;
+			}
+		}
+
+		if (contactCount != 0) {
+			contactCount--;
+		}
+	}
+
+	@Override
+	public boolean goContact(String lastName) {
+		tempContact = currentContact;
+		boolean found = false;
+		int i = 0;
+		while (getCurrent().getLastName() != lastName && i < contactCount) {
+			goNext();
+			i++;
+			found = false;
+		}
+		if (getCurrent().getLastName() == lastName) {
+			found = true;
+		} else {
+			currentContact = tempContact;
+		}
+		return found;
+	}
+
+	@Override
+	public void sortOnLastName() {
+		if(getCurrent().getFirstName().charAt(0) < currentContact.next.getStoredContact().getFirstName().charAt(0));
+
+	}
+
+}

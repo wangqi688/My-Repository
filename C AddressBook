@@ -1,0 +1,358 @@
+/*
+ ============================================================================
+ Name        : CHolzAddressBook.c
+ Author      : Cedric Holz
+ ============================================================================
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "Node.h"
+#include <string.h>
+#include <ctype.h>
+
+
+int main(void) {
+	setvbuf(stdout, NULL, _IONBF, 0);
+	FILE * pInFile;
+	//The top of the list.
+	head = NULL;
+	pNode pCurNode = NULL;
+	int numberContacts = 0;
+
+	char buffer[BUFSIZ + 1];
+	char contactInfo[BUFSIZ + 1];
+	char * tempSrc;
+	printf("Ready\n");
+	int done = 0;
+	char command = 'k';
+	int currentNdx = 0;
+	int delIndex;
+	int fieldNdx;
+	char outPutFile[255];
+	char fieldName[255];
+	char newBuffer[255];
+	char inputFile[255];
+
+	//While we haven't told to quite we await action.
+	while (done == 0) {
+
+		command = *gets(buffer);
+
+		switch (command) {
+		//switch to add a comment.
+		case 'a':
+			numberContacts++;
+
+			int contactNdx = atoi(gets(buffer));
+			char contactData[255];
+			gets(contactData);
+			insertDelimited(contactNdx, contactData);
+
+			break;
+			//Deletes a comment
+		case 'd':
+
+			delIndex = atoi(gets(buffer));
+			if (delIndex > numberContacts - 1) {
+				break;
+			} else {
+				delete(delIndex);
+				numberContacts--;
+			}
+
+			break;
+			//Calls the get contact function.
+		case 'g':
+			printf("%s", getContact(contactInfo, atoi(gets(buffer))));
+			break;
+			//calls the getfield function.
+		case 'f':
+			fieldNdx = atoi(gets(newBuffer));
+			gets(fieldName);
+			getField(fieldNdx, fieldName);
+
+			break;
+			//prints out the number of contacts.
+		case 'n':
+			printf("%d\n", numberContacts);
+			break;
+//takes contacts from a file and puts them in the linked list.
+		case 'l':
+			gets(inputFile);
+
+			pInFile = fopen(inputFile, "r");
+
+			int contactNo = 0;
+			char currentLine[BUFSIZ + 1];
+			fgets(currentLine, BUFSIZ, pInFile);
+			while (!feof(pInFile)) {
+				if (fgets(currentLine, BUFSIZ, pInFile) != NULL) {
+					insertDelimited(contactNo, currentLine);
+					contactNo++;
+					numberContacts++;
+				}
+			}
+
+			fclose(pInFile);
+			break;
+			//saves the current linked list to a file.
+		case 's':
+
+			gets(outPutFile);
+			saveFile(outPutFile, numberContacts);
+
+			break;
+			//quits the program when finished.
+		case 'q':
+			printf("Complete\n");
+			done = 1;
+			break;
+			//Edits the field.
+		case 'e':
+			editField();
+			break;
+		case 'o':
+			break;
+		}
+
+	}
+
+}
+
+----------------------------------------
+
+/*
+ * Node.h
+ */
+
+#ifndef NODE_H_
+#define NODE_H_
+
+struct node {
+	char lastName[256];
+	char firstName[256];
+	char email[256];
+	char phoneNumber[256];
+	struct node *pNext;
+};
+
+typedef struct node Node;
+typedef Node* pNode;
+
+pNode head; //first node in the list
+
+//Insert a node with data value in a sorted order
+void insert(int ndx,char *last_name, char *first_name, char *email,char *phone_number);
+//Delete a node in the list that has data value value
+void insertDelimited(int contactNdx, char *contactData);
+char* getContact(char* destination, int ndx);
+void getField(int ndx, char* Field);
+char delete(int ndx);
+char* getContact(char*,int);
+void saveFile(char* outPutFile, int num);
+void editField();
+
+
+#endif /* NODE_H_ */
+------------------------------------------------------
+
+/*
+ * Node.c
+ */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "Node.h"
+
+//inserts a contact one by one.
+void insert(int ndx, char *lastVal, char *firstVal, char *emailVal,
+		char *phoneVal) {
+	pNode pNewNode;
+	pNode pPreviousNode;
+	pNode pCurNode;
+
+	pNewNode = malloc(sizeof(Node));
+
+	if (pNewNode) {
+
+		strcpy(pNewNode->lastName, lastVal);
+		strcpy(pNewNode->firstName, firstVal);
+		strcpy(pNewNode->email, emailVal);
+		strcpy(pNewNode->phoneNumber, phoneVal);
+
+		int currentNdx = 0;
+
+		pNewNode->pNext = NULL;
+		pPreviousNode = NULL;
+//adds contacts to linked list.
+		if (ndx == 0) {
+			if (head == NULL) {
+				head = pNewNode;
+				head->pNext = NULL;
+			} else {
+				pNewNode->pNext = head;
+				head = pNewNode;
+			}
+		} else {
+
+			pCurNode = head;
+			while (pCurNode && currentNdx < ndx) {
+				pPreviousNode = pCurNode;
+				pCurNode = pCurNode->pNext;
+				currentNdx++;
+			}
+
+			pNewNode->pNext = pCurNode;
+
+			pPreviousNode->pNext = pNewNode;
+		}
+	}
+}
+
+//Inserts contacts when they are in the right format.
+void insertDelimited(int contactNdx, char *contactData) {
+	char lastName[255];
+	char firstName[255];
+	char email[255];
+	char phone[255];
+
+	int whichContact = 1;
+
+	char* delimItem;
+
+	delimItem = strtok(contactData, ",");
+
+	strcpy(lastName, delimItem);
+//Strips apart the line of text
+	while (whichContact <= 3) {
+		delimItem = strtok(NULL, ",");
+
+		if (whichContact == 1) {
+			strcpy(firstName, delimItem);
+
+			delimItem = strtok(NULL, ",");
+			whichContact++;
+		}
+		if (whichContact == 2) {
+			strcpy(email, delimItem);
+
+			delimItem = strtok(NULL, "\n");
+			whichContact++;
+		}
+		if (whichContact == 3) {
+			strcpy(phone, delimItem);
+
+			whichContact++;
+		}
+
+	}
+	insert(contactNdx, lastName, firstName, email, phone);
+
+}
+
+//Saves the file
+void saveFile(char* outPutFile, int num) {
+	char contactInfo[255];
+	FILE *pOutFile;
+	pOutFile = fopen(outPutFile, "w");
+	int index = 0;
+	fprintf(pOutFile, "lastName,firstName,email,phoneNumber\n");
+	while (index < num) {
+		fprintf(pOutFile, getContact(contactInfo, index));
+		index++;
+	}
+	fclose(pOutFile);
+}
+
+//Edits the field
+void editField(){
+
+}
+
+
+//Outputs the contact at a certain index.
+char* getContact(char* destination, int ndx) {
+	int currentNdx = 0;
+	pNode pCurNode;
+
+//	destination[0] = '\0';
+
+	pCurNode = head;
+	if (ndx > 0) {
+		while (pCurNode && currentNdx < ndx) {
+			pCurNode = pCurNode->pNext;
+			currentNdx++;
+		}
+
+	}
+	strcpy(destination, pCurNode->lastName);
+	strcat(destination, ",");
+	strcat(destination, pCurNode->firstName);
+	strcat(destination, ",");
+	strcat(destination, pCurNode->email);
+	strcat(destination, ",");
+	strcat(destination, pCurNode->phoneNumber);
+	strcat(destination, "\n");
+	return destination;
+}
+
+//Gets a certain part of the contact info.
+void getField(int ndx, char* Field) {
+	int currentNdx = 0;
+	pNode pCurNode;
+
+	pCurNode = head;
+
+	if (ndx > 0) {
+		while (pCurNode && currentNdx < ndx) {
+			pCurNode = pCurNode->pNext;
+			currentNdx++;
+		}
+	}
+	if (strcmp("lastName", Field) == 0) {
+		printf("%s", pCurNode->lastName);
+	}
+
+	if (strcmp("firstName", Field) == 0) {
+		printf("%s", pCurNode->firstName);
+	}
+
+	if (strcmp("email", Field) == 0) {
+		printf("%s", pCurNode->email);
+	}
+
+	if (strcmp("phoneNumber", Field) == 0) {
+		printf("%s", pCurNode->phoneNumber);
+	}
+}
+
+//Deletes a contact
+char delete(int ndx) {
+	pNode pTempNode;
+	pNode pPreviousNode;
+	pNode pCurNode;
+	int currentNdx = 0;
+
+	if (ndx == 0 && head) {
+		pTempNode = head;
+		head = head->pNext;
+		free(pTempNode);
+	} else {
+
+		pCurNode = head;
+		while (pCurNode && currentNdx < ndx) {
+			pPreviousNode = pCurNode;
+			pCurNode = pCurNode->pNext;
+			currentNdx++;
+		}
+
+		if (pCurNode) {
+			pTempNode = pCurNode;
+			pPreviousNode->pNext = pCurNode->pNext;
+			free(pTempNode);
+		}
+
+	}
+	return '\0';
+}

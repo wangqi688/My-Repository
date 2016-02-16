@@ -1,0 +1,94 @@
+/**
+ * CS 105 Theory and Practice I
+ * CRN: [38065]
+ * Assignment: AlignedNumbers
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author [Cedric Holz]
+ */
+package edu.sbcc.cs105;
+
+/**
+ * This class computes the statistics of two integers and prints them out.
+ *
+ */
+public class AlignedNumbers {
+	private int firstNumber;
+	private int secondNumber;
+
+	// Sets the first number
+	public void setFirstNumber(int firstNo) {
+		firstNumber = firstNo;
+	}
+
+	// Sets the second number
+	public void setSecondNumber(int secondNo) {
+		secondNumber = secondNo;
+	}
+
+	// returns the sum of the two numbers
+	public int getSum() {
+		return firstNumber + secondNumber;
+
+	}
+
+	// returns the average of the numbers
+	public double getAverage() {
+		double a = firstNumber;
+		double b = secondNumber;
+
+		return (a + b) / 2;
+
+	}
+
+	// Gets the difference from the second to the first number
+	public int getDifference() {
+		return secondNumber - firstNumber;
+
+	}
+
+	// Returns the product of the numbers
+	public int getProduct() {
+		return firstNumber * secondNumber;
+	}
+
+	// Returns the absolute value of the distance
+	public int getDistance() {
+		return Math.abs(firstNumber - secondNumber);
+
+	}
+
+	// returns the largest number
+	public int getMaximum() {
+		int max = firstNumber;
+		if (secondNumber > firstNumber) {
+			max = secondNumber;
+		}
+		return max;
+	}
+
+	// returns the smallest number
+	public int getMinimum() {
+		int min = firstNumber;
+		if (secondNumber < firstNumber) {
+			min = secondNumber;
+		}
+		return min;
+	}
+
+	// Prints out the stats
+	public void printStats() {
+
+		System.out.printf("Sum:%26d\n", getSum());
+		System.out.printf("Average:%25.2f\n", getAverage());
+		System.out.printf("Difference:%19d\n", getDifference());
+		System.out.printf("Product:%22d\n", getProduct());
+		System.out.printf("Distance:%21d\n", getDistance());
+		System.out.printf("Maximum:%22d\n", getMaximum());
+		System.out.printf("Minimum:%22d\n", getMinimum());
+
+	}
+
+}

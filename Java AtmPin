@@ -1,0 +1,61 @@
+package edu.sbcc.cs105;
+
+public class AtmPin {
+
+	boolean badpass;
+
+	String password = "1234";
+	int timesTried;
+
+	public AtmPin() {
+
+	}
+
+	// Checks to see if the pin code will be accepted
+	public boolean acceptPinCode(String code) {
+
+		// if its blocked don't accept
+		if (isBlocked()) {
+			// Still check if pass is good or bad
+			if (code == "1234") {
+				badpass = false;
+			} else
+				badpass = true;
+			System.out.println("It is blocked");
+			return false;
+		}
+		// If the code is good and not blocked, return true
+		if (code == "1234") {
+			System.out.println("The code is valid");
+			badpass = false;
+			return true;
+		} else {
+			// If not blocked but false return false and put times tried up one
+			System.out.println("The password is Bad");
+			badpass = true;
+			timesTried++;
+			return false;
+		}
+	}
+
+	// check if password is bad
+	public boolean isBadPassword() {
+		return badpass;
+	}
+
+	// If the times a bad password is entered is more than 3, block the atm
+	public boolean isBlocked() {
+		if (timesTried > 3) {
+			System.out.println("The ATM is now blocked.");
+			return true;
+		} else
+			return false;
+	}
+
+	// reset the counter and unlock the atm
+	public void resetPasswordAttempts() {
+		System.out.println("The password attempts as been reset");
+		timesTried = 0;
+	}
+
+}

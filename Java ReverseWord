@@ -1,0 +1,70 @@
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: ReverseWord
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+
+/**
+ * This class takes a word and reverses it
+ */
+
+package edu.sbcc.cs105;
+
+public class ReverseWord {
+
+	String theWord = "";
+
+	/**
+	 * Constructor
+	 */
+	public ReverseWord() {
+
+	}
+
+	/**
+	 * Takes a word from user and stores it
+	 * 
+	 * @param word
+	 *            word from user
+	 */
+
+	public void setWord(String word) {
+
+		theWord = word;
+
+	}
+
+	/**
+	 * Returns the word that is saved
+	 * 
+	 * @return
+	 */
+
+	public String getWord() {
+		return theWord;
+
+	}
+
+	/**
+	 * Gets the reversed word
+	 * 
+	 * @return
+	 */
+
+	public String getReversedWord() {
+
+		int l = theWord.length();
+		int i;
+		StringBuilder backwards = new StringBuilder(l);
+		for (i = l - 1; i >= 0; i--) {
+			backwards.append(theWord.charAt(i));
+		}
+		return backwards.toString();
+
+	}
+}

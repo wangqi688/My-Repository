@@ -1,0 +1,81 @@
+
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: Dedup
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+package edu.sbcc.cs105;
+
+import java.io.*;
+import java.util.*;
+
+public class Dedup {
+
+	/**
+	 * This class takes in a list of numbers and gets rid of the duplicates and
+	 * then sorts the new list
+	 */
+
+	File newFile = null;
+	boolean fresh = true;
+	// List of Numbers
+	List<Integer> numList = new ArrayList<Integer>();
+
+	/**
+	 * Takes in the file and fills the list of numList with all the numbers
+	 * 
+	 * @param filename
+	 *            The Name of the files
+	 * @throws Exception
+	 */
+	public Dedup(String filename) throws Exception {
+		newFile = new File(filename);
+
+		Scanner s = null;
+		try {
+			s = new Scanner(newFile);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		while (s.hasNextLine()) {
+			String lineFromFile = s.nextLine();
+			numList.add(Integer.parseInt(lineFromFile));
+		}
+	}
+
+	/**
+	 * Returns the frequency of values in the numList
+	 * 
+	 * @param ofThisValue
+	 *            Value to see how many there are
+	 * @return
+	 */
+	public int howMany(int ofThisValue) {
+		return Collections.frequency(numList, ofThisValue);
+	}
+
+	/**
+	 * Takes out all the doubles of numList and sorts it
+	 * 
+	 * @return
+	 */
+	public ArrayList<Integer> returnUnique() {
+		ArrayList<Integer> uniqueList = new ArrayList<Integer>();
+
+		for (int i = 0; i < numList.size(); i++) {
+			if (!uniqueList.contains(numList.get(i))) {
+				uniqueList.add(numList.get(i));
+			}
+		}
+		Collections.sort(uniqueList);
+
+		return uniqueList;
+
+	}
+}

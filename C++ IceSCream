@@ -1,0 +1,127 @@
+//============================================================================
+// Name    	: IceCream.cpp
+// Author  	: Cedric Holz
+// Professor   : Jackie Kuehn
+// Description : CS 140 C++
+// Date    	: 1/27/16
+//============================================================================
+
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+
+using namespace std;
+int MAXCONES = 10;
+int MAXSCOOPS = 5;
+
+void DisplayTitle() {
+    cout << "Bob and Jackie's Ice Cream" << endl;
+    cout << "1 Scoop ->        	$2.00" << endl;
+    cout << "2 Scoops ->       	$3.00" << endl;
+    cout << "Each Scoop after 2 -> $.75\n" << endl;
+    cout << "Ice Cream Flavors: Only one input character for each flavor."
+   		 << endl;
+}
+
+float coneCost(int scoops) {
+    float total = 0;
+
+    if (scoops == 1) {
+   	 total = 2.00;
+    }
+    if (scoops == 2) {
+   	 total = 3;
+    }
+    if (scoops > 2) {
+   	 total = 3 + .75 * (scoops - 2);
+    }
+
+    return total;
+
+}
+
+void printCone(string flavors[], int scoops) {
+    int count = 0;
+    cout << "Here is your cone! Enjoy!!!" << endl;
+    while (count < scoops) {
+   	 cout << "( " << flavors[count] << " )" << endl;
+   	 count++;
+    }
+    cout << "\\   /" << endl;
+    cout << "  |" << endl;
+}
+
+float getScoops(int coneNumber) {
+    cout << "How many scoops for cone " << coneNumber + 1
+   		 << "? (limit 5 scoops per cone)" << endl;
+    int scoops = 0;
+
+    while (!(scoops > 0 && scoops <= MAXSCOOPS)) {
+   	 cin >> scoops;
+   	 if (cin.fail()) {
+   		 cin.clear();
+   		 cin.ignore(1024, '\n');
+   		 scoops = -1;
+   	 }
+   	 if (!(scoops > 0 && scoops <= MAXSCOOPS)) {
+   		 cout
+   				 << "You have entered incorrectly, enter a number between 1 and 5"
+   				 << endl;
+   	 }
+    }
+
+    string flavors[scoops];
+    cin.clear();
+    cin.ignore(1024, '\n');
+    int count = 0;
+    while (count < scoops) {
+   	 cout << "Specify the flavor for scoop " << count + 1 << ":" << endl;
+   	 while (true) {
+   		 string flavor = "";
+   		 getline(cin, flavor);
+   		 if (flavor.size() == 1) {
+   			 flavors[count] = flavor;
+   			 break;
+   		 }
+   		 cout << "That is not a valid flavor, try again" << endl;
+   	 }
+   	 count++;
+    }
+    printCone(flavors, scoops);
+
+    return coneCost(scoops);
+}
+
+int main() {
+    int cones = 0;
+    int coneCount = 0;
+    float total;
+
+    DisplayTitle();
+
+    cout << "Please input number of cones that you wish to purchase." << endl;
+
+    while (!(cones > 0 && cones <= MAXCONES)) {
+   	 cin >> cones;
+   	 if (cin.fail()) {
+   		 cin.clear();
+   		 cin.ignore(1024, '\n');
+   		 cones = -1;
+   	 }
+   	 if (!(cones > 0 && cones <= MAXCONES)) {
+   		 cout
+   				 << "You have entered incorrectly, enter a number between 1 and 10"
+   				 << endl;
+   	 }
+    }
+
+    while (coneCount < cones) {
+   	 total += getScoops(coneCount);
+   	 coneCount++;
+    }
+    cout << "Total charge: $" << total << endl;
+    return 0;
+}
+
+

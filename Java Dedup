@@ -1,3 +1,33 @@
+/**
+ * CS 135 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: Dedup
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+package edu.sbcc.cs105;
+
+public class Main {
+
+	public static void main(String[] args) throws Exception {
+
+		Dedup d = new Dedup("small.txt");
+		System.out.println(d.numList.get(1) + "\n");
+
+		for (int i = 0; i < d.returnUnique().size(); i++) {
+			System.out.print(d.returnUnique().get(i) + "\n");
+		}
+	}
+}
+
+
+
+---------------------------------------------------------------------------
+
+
 
 /**
  * CS 105 Programming Fundamentals

@@ -1,0 +1,392 @@
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: ResistorDecoder
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+package edu.sbcc.cs105;
+
+public class Main {
+
+	public static void main(String[] args) {
+
+		ResistorDecoder r = new ResistorDecoder();
+
+		String[] resistor0 = { "Black", "Brown", "Black", "Gold" };
+		System.out.println(r.decodeResistor(resistor0));
+
+		String[] resistor1 = { "Yellow", "Violet", "Red", "Violet" };
+
+		System.out.println(r.decodeResistor(resistor1));
+
+		String[] resistor2 = { "Brown", "Black", "Violet", "Brown" };
+
+		System.out.println(r.decodeResistor(resistor2));
+	}
+}
+
+---------------------------------------------------------------------------
+
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: ResistorDecoder
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+package edu.sbcc.cs105;
+
+public class ResistorDecoder {
+	/**
+	 * This class takes the colors on the resistors and sends them one by one to
+	 * the lookup table
+	 */
+
+	// The String to be output
+	String outString = "";
+
+	// The Lookup Table Object
+	LookupTable lt = new LookupTable();
+
+	// Constructor
+	public ResistorDecoder() {
+
+	}
+
+	/**
+	 * Takes each color and sends it along with which band it is to the lookup
+	 * table
+	 * 
+	 * @param resistorColor
+	 *            The String of the resistor band.
+	 * @return
+	 */
+	public String decodeResistor(String[] resistorColor) {
+		for (int i = 0; i < resistorColor.length; i++) {
+			outString += lt.get(resistorColor[i], i + 1);
+		}
+		return lt.getToReturn();
+
+	}
+
+}
+
+---------------------------------------------------------
+
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: ResistorDecoder
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+package edu.sbcc.cs105;
+
+public class ToleranceLookup {
+	/**
+	 * This class adds the Ohm and tolerance to the end of the final string.
+	 */
+
+	public ToleranceLookup() {
+
+	}
+
+	/**
+	 * Returns the ohm and tolerance of color band.
+	 * 
+	 * @param color
+	 *            The Color.
+	 * @return
+	 */
+
+	public String getT(String color) {
+		switch (color) {
+		case "Black":
+			return "Ω";
+		case "Brown":
+			return "Ω, ±1%";
+		case "Red":
+			return "Ω, ±2%";
+		case "Orange":
+			return "Ω";
+		case "Yellow":
+			return "Ω, ±5%";
+		case "Green":
+			return "Ω, ±0.5%";
+		case "Blue":
+			return "Ω, ±0.25%";
+		case "Violet":
+			return "Ω, ±0.1%";
+		case "Gray":
+			return "Ω, ±10%";
+		case "White":
+			return "Ω";
+		case "Gold":
+			return "Ω, ±5%";
+		case "Silver":
+			return "Ω, ±10%";
+		case "None":
+			return "Ω, ±20%";
+		default:
+			return "0";
+
+		}
+	}
+
+}
+----------------------------------------------------------------
+
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: ResistorDecoder
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+package edu.sbcc.cs105;
+
+import java.text.*;
+
+public class LookupTable {
+	/**
+	 * This class gathers information from the three tables.
+	 */
+
+	// The three table objects
+	NumberLookup n = new NumberLookup();
+	MultiplierLookup m = new MultiplierLookup();
+	ToleranceLookup t = new ToleranceLookup();
+
+	// The first two bands put together
+	String baseNumber = "";
+
+	// The first two bands multiplied by the multiplier of the third band.
+	double fullNumber = 0;
+
+	// The finished string to return
+	String toReturn = "";
+
+	/**
+	 * Compiles the toReturn string by gathering data from the 3 tables. First
+	 * and second bands make up the number, third is the multiplier then the
+	 * fourth is the tolerance that is tacked on at the end.
+	 * 
+	 * @param color
+	 *            Color of the band
+	 * @param band
+	 *            Which band it is
+	 * @return
+	 */
+	public String get(String color, int band) {
+		// If its the first band and its black don't put anything.
+		// else start making the baseNumber;
+		if (band == 1) {
+			baseNumber = "";
+			fullNumber = 0;
+			toReturn = "";
+
+			if (color.equals("Black")) {
+				baseNumber += "";
+			} else
+				baseNumber += n.getNo(color);
+		}
+		// Continue the base number
+		if (band == 2) {
+			baseNumber += n.getNo(color);
+		}
+		// Takes the base number multiplied by the multiplier and if it's bigger
+		// than 1000 we add a suffix.
+		if (band == 3) {
+			fullNumber = Integer.parseInt(baseNumber) * m.getM(color);
+			if (fullNumber >= 1000) {
+				toReturn = addSuffix(fullNumber);
+			} else
+				toReturn = Integer.toString((int) fullNumber);
+		}
+		// tacks on the tolerance of the resistor.
+		if (band == 4) {
+			toReturn += t.getT(color);
+		}
+
+		return null;
+
+	}
+
+	// The metric suffixes
+	private static char[] suffix = new char[] { 'K', 'M', 'B' };
+
+	/**
+	 * Takes in a number, puts the decimal in the appropriate place and adds the
+	 * appropriate suffix
+	 * 
+	 * @param number
+	 *            The number to be fixed;
+	 * @return
+	 */
+	private static String addSuffix(double number) {
+		int exponent = (int) Math.log10(number);
+		int suffixToAdd = exponent / 3;
+		double divisor = Math.pow(10, suffixToAdd * 3);
+
+		String s = Double.toString(number / divisor);
+
+		DecimalFormat decimalFormat = new DecimalFormat("0.#####");
+
+		return decimalFormat.format(Double.valueOf(s)) + suffix[suffixToAdd - 1];
+	}
+
+	/**
+	 * Allows the finished string to be called upon.
+	 * 
+	 * @return
+	 */
+	public String getToReturn() {
+		return toReturn;
+	}
+
+}
+
+---------------------------------------------------------
+
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: ResistorDecoder
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+package edu.sbcc.cs105;
+
+public class MultiplierLookup {
+
+	/**
+	 * This is the multiplier table
+	 */
+
+	public MultiplierLookup() {
+	}
+
+	/**
+	 * Returns the multiplier tied with a color band.
+	 * 
+	 * @param color
+	 *            The color.
+	 * @return
+	 */
+
+	public double getM(String color) {
+		switch (color) {
+		case "Black":
+			return 1;
+		case "Brown":
+			return 10;
+		case "Red":
+			return 100;
+		case "Orange":
+			return 1000;
+		case "Yellow":
+			return 10000;
+		case "Green":
+			return 100000;
+		case "Blue":
+			return 1000000;
+		case "Violet":
+			return 10000000;
+		case "Gray":
+			return 100000000;
+		case "White":
+			return 1000000000;
+		case "Gold":
+			return 1;
+		case "Silver":
+			return .01;
+		case "None":
+			return 1;
+		default:
+			return 1;
+
+		}
+	}
+}
+
+------------------------------------------------------
+
+
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: ResistorDecoder
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+package edu.sbcc.cs105;
+
+/**
+ * This class gives the numbers that the bands represent.
+ * 
+ * @author Cedric
+ *
+ */
+
+public class NumberLookup {
+
+	public NumberLookup() {
+
+	}
+
+	/**
+	 * Returns a number tied with each color.
+	 * 
+	 * @param color
+	 *            The color
+	 * @return
+	 */
+	public String getNo(String color) {
+		switch (color) {
+		case "Black":
+			return "0";
+		case "Brown":
+			return "1";
+		case "Red":
+			return "2";
+		case "Orange":
+			return "3";
+		case "Yellow":
+			return "4";
+		case "Green":
+			return "5";
+		case "Blue":
+			return "6";
+		case "Violet":
+			return "7";
+		case "Gray":
+			return "8";
+		case "White":
+			return "9";
+		case "None":
+			return "0";
+		default:
+			return "0";
+
+		}
+	}
+}

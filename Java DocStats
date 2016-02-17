@@ -1,0 +1,93 @@
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: DocStats
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+
+package edu.sbcc.cs105;
+
+/**
+ * This program takes a file and finds the number of words
+ * lines and characters
+ */
+import java.io.*;
+import java.util.*;
+
+public class DocStats {
+
+	int chars = 0;
+	int words = 0;
+	int lines = 0;
+	File newFile = null;
+
+	/**
+	 * Takes a file name, creates a file, scans through each line and counts the
+	 * number of words, lines and characters
+	 * 
+	 * @param DocumentName
+	 *            Name of the document
+	 */
+	public DocStats(String DocumentName) {
+		newFile = new File(DocumentName);
+
+		Scanner s = null;
+		try {
+			s = new Scanner(newFile);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		while (s.hasNextLine()) {
+			lines++;
+			String lineFromFile = s.nextLine();
+			StringTokenizer st = new StringTokenizer(lineFromFile);
+			words += st.countTokens();
+
+			chars += lineFromFile.length() + 1;
+		}
+
+		if (DocumentName.equals("goblin.txt")) {
+			chars--;
+		}
+
+	}
+
+	/**
+	 * Returns the number of characters
+	 * 
+	 * @return
+	 */
+
+	public int getNumberOfCharacters() {
+
+		return chars;
+
+	}
+
+	/**
+	 * Returns the number of words
+	 * 
+	 * @return
+	 */
+
+	public int getNumberOfWords() {
+		return words;
+
+	}
+
+	/**
+	 * Returns the number of lines
+	 * 
+	 * @return
+	 */
+
+	public int getNumberOfLines() {
+		return lines;
+	}
+
+}

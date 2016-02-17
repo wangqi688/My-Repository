@@ -1,0 +1,68 @@
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: Factors
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+
+/**
+ * This program Takes in numbers and outputs their factors
+ */
+package edu.sbcc.cs105;
+
+import java.util.*;
+
+public class Factors {
+	// Array of integers
+	List<Integer> ArrayList = new ArrayList<Integer>();
+
+	public int factorIndex;
+
+	/**
+	 * This method takes numbers and puts its prime factors into an array
+	 * 
+	 * @param numberToFactor
+	 *            The number to factor
+	 */
+	public Factors(int numberToFactor) {
+		int n = numberToFactor;
+		for (int i = 2; i <= n; i++) {
+			while (n % i == 0) {
+				ArrayList.add(i);
+				n /= i;
+			}
+		}
+	}
+
+	/**
+	 * Checks to see if there are more factors in the ArrayList
+	 * 
+	 * @return
+	 */
+	public boolean hasMoreFactors() {
+		if (factorIndex == ArrayList.size()) {
+			return false;
+		} else
+			return true;
+
+	}
+
+	/**
+	 * Moves to the nextFactor in ArrayList
+	 * 
+	 * @return
+	 */
+	public int nextFactor() {
+		if (hasMoreFactors()) {
+			int nextFact = ArrayList.get(factorIndex);
+			factorIndex++;
+			return nextFact;
+		} else
+			return ArrayList.get(factorIndex);
+	}
+
+}

@@ -1,0 +1,620 @@
+package com.cedricholz.beerlauncher;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.CountDownTimer;
+import android.os.Message;
+import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.content.IntentFilter;
+import android.widget.Toast;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.UUID;
+
+import android.os.Handler;
+
+import javax.xml.transform.Result;
+
+
+public class MainActivity extends ActionBarActivity {
+
+    private BluetoothAdapter BA;
+    private BluetoothSocket btSocket = null;
+
+    private OutputStream outStream = null;
+    private static String address = "00:00:00:00:00:00";
+    private static final UUID MY_UUID = UUID
+            .fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private TextView connected;
+    private TextView loaded;
+    private TextView Result;
+
+
+
+    volatile boolean stopWorker;
+    int readBufferPosition;
+    byte[] readBuffer;
+    Thread workerThread;
+    InputStream mmInputStream;
+
+
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        BA = BluetoothAdapter.getDefaultAdapter();
+        lv = (ListView) findViewById(R.id.listView1);
+
+        connected = (TextView) findViewById(R.id.connectedText);
+        loaded = (TextView) findViewById(R.id.loadedText);
+
+        Result = (TextView) findViewById(R.id.textView);
+
+
+
+        checkBt();
+
+        final Button connectButton = (Button) findViewById(R.id.connectButton);
+        connectButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                chooseConnection();
+            }
+        });
+
+        final Button loadButton = (Button) findViewById(R.id.loadButton);
+        loadButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    loaded.setVisibility(View.VISIBLE);
+                    writeData("G");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+
+        final ImageButton leftButton = (ImageButton) findViewById(R.id.leftButton);
+        leftButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    writeData("L");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        final ImageButton rightButton = (ImageButton) findViewById(R.id.rightButton);
+        rightButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    writeData("R");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+        final ImageButton downButton = (ImageButton) findViewById(R.id.downButton);
+        downButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    writeData("D");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        final ImageButton upButton = (ImageButton) findViewById(R.id.upButton);
+        upButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    writeData("U");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        final ImageButton fireButton = (ImageButton) findViewById(R.id.fireButton);
+        fireButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    loaded.setVisibility(View.INVISIBLE);
+                    writeData("F");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+
+
+
+
+    private Set<BluetoothDevice> pairedDevices;
+    final ArrayList pairedList = new ArrayList();
+    final ArrayList pairedMacs = new ArrayList();
+
+
+    private ListView lv;
+
+    private ListView scannedListView;
+
+
+
+
+    public void chooseConnection(){
+
+        pairedDevices = BA.getBondedDevices();
+        pairedList.clear();
+        pairedMacs.clear();
+
+
+            for (BluetoothDevice bt : pairedDevices) {
+                pairedList.add(bt.getName() + "\n" + bt.getAddress());
+                pairedMacs.add(bt.getAddress());
+            }
+
+
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
+        LayoutInflater inflater = getLayoutInflater();
+        View convertView = (View) inflater.inflate(R.layout.custom, null);
+        alertDialog.setView(convertView);
+        alertDialog.setTitle("Paired Devices");
+
+       // alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "SCAN FOR MORE DEVICES", new OnClickListener() {
+       //     @Override
+          //  public void onClick(DialogInterface dialog, int which) {
+
+
+        //    }
+     //   });
+
+
+        final ListView lv = (ListView) convertView.findViewById(R.id.listView1);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, pairedList);
+        lv.setAdapter(adapter);
+        lv.setClickable(true);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
+
+                                  {
+                                      @Override
+                                      public void onItemClick(AdapterView<?> arg0, View arg1, int position,
+                                                              long arg3) {
+                                          address = pairedMacs.get(position).toString();
+                                          connect();
+                                          alertDialog.dismiss();
+                    }
+                    }
+                    );
+                    alertDialog.show();
+                }
+
+
+    public void connect (){
+
+
+
+        BluetoothDevice device = BA.getRemoteDevice(address);
+
+
+        try {
+            btSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            btSocket.connect();
+            makeToast("Connected To Device");
+            connected.setVisibility(View.VISIBLE);
+
+          //  beginListenForData();
+
+        } catch (IOException e) {
+
+            try {
+                btSocket.close();
+            } catch (IOException e1) {
+                makeToast("Unable to end Connection");
+            }
+
+            makeToast("Connection Failed");
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    public void makeToast(String message){
+        Toast.makeText(getApplicationContext(), message,
+                Toast.LENGTH_LONG).show();
+    }
+
+
+
+    private void writeData(String data) {
+        try {
+            outStream = btSocket.getOutputStream();
+        } catch (IOException e) {
+        }
+
+        String message = data;
+        byte[] msgBuffer = message.getBytes();
+
+        try {
+            outStream.write(msgBuffer);
+        } catch (IOException e) {
+        }
+    }
+
+
+    public void checkBt() {
+        if (!BA.isEnabled()) {
+            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(turnOn, 0);
+        }
+        if (BA.isEnabled()) {
+        }
+    }
+
+
+    protected void onDestroy() {
+        super.onDestroy();
+
+        try {
+            btSocket.close();
+            connected.setVisibility(View.GONE);
+        } catch (IOException e) {
+        }
+    }
+
+
+
+
+    void beginListenForData()
+    {
+        final Handler handler = new Handler();
+        final byte delimiter = 10;
+        stopWorker = false;
+        readBufferPosition = 0;
+        readBuffer = new byte[1024];
+
+        try {
+            mmInputStream = btSocket.getInputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        workerThread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                while(!Thread.currentThread().isInterrupted() && !stopWorker)
+                {
+                    try
+                    {
+                        int bytesAvailable = mmInputStream.available();
+                        if(bytesAvailable > 0)
+                        {
+                            byte[] packetBytes = new byte[bytesAvailable];
+                            mmInputStream.read(packetBytes);
+                            for(int i=0;i<bytesAvailable;i++)
+                            {
+                                byte b = packetBytes[i];
+                                if(b == delimiter)
+                                {
+                                    byte[] encodedBytes = new byte[readBufferPosition];
+                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                    final String data = new String(encodedBytes, "US-ASCII");
+                                    readBufferPosition = 0;
+
+                                    handler.post(new Runnable()
+                                    {
+                                        public void run()
+                                        {
+                                            Result.setText(data);
+                                        }
+                                    });
+                                }
+                                else
+                                {
+                                    readBuffer[readBufferPosition++] = b;
+                                }
+                            }
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        stopWorker = true;
+                    }
+                }
+            }
+        });
+
+        workerThread.start();
+    }
+}
+
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@drawable/gradient"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity"
+
+>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Connected"
+        android:id="@+id/connectedText"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/connectButton"
+        android:layout_alignStart="@+id/connectButton"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connect"
+        android:id="@+id/connectButton"
+        android:onClick="connectDialog"
+        android:layout_marginBottom="9dp"
+        android:layout_above="@+id/connectedText"
+        android:layout_toLeftOf="@+id/downButton"
+        android:layout_toStartOf="@+id/downButton" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/downButton"
+        android:layout_above="@+id/connectButton"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/transparent"
+        android:src="@drawable/downbutton" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/rightButton"
+        android:layout_above="@+id/downButton"
+        android:layout_toRightOf="@+id/downButton"
+        android:layout_toEndOf="@+id/downButton"
+        android:background="@android:color/transparent"
+        android:src="@drawable/rightbutton" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/leftButton"
+        android:layout_above="@+id/downButton"
+        android:layout_toLeftOf="@+id/downButton"
+        android:layout_toStartOf="@+id/downButton"
+        android:background="@android:color/transparent"
+        android:src="@drawable/leftbutton" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/upButton"
+        android:layout_above="@+id/rightButton"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/transparent"
+        android:src="@drawable/upbutton" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fireButton"
+        android:layout_above="@+id/downButton"
+        android:layout_centerHorizontal="true"
+        android:background="@android:color/transparent"
+        android:src="@drawable/firebutton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Load"
+        android:id="@+id/loadButton"
+        android:layout_below="@+id/downButton"
+        android:layout_toRightOf="@+id/downButton"
+        android:layout_toEndOf="@+id/downButton" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loaded"
+        android:id="@+id/loadedText"
+        android:visibility="invisible"
+        android:layout_alignBaseline="@+id/connectedText"
+        android:layout_alignBottom="@+id/connectedText"
+        android:layout_alignLeft="@+id/loadButton"
+        android:layout_alignStart="@+id/loadButton"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp" />
+
+
+    <!-- "Icons made by http://www.flaticon.com/authors/freepikr from ttp://www.flaticon.com and is licensed by http://creativecommons.org/licenses/by/3.0/ CC BY 3.0-->
+</RelativeLayout>
+
+
+
+-----------------------------------------------------------------------------------------------------------------------
+
+
+
+char blueToothVal;           //value sent over via bluetooth
+char lastValue;              //stores last state of device (on/off)
+#include <Servo.h>
+Servo leftServo;
+Servo bottomServo;
+Servo rightServo;
+
+int basePos = 90;
+int leftCanPos = 176;
+int rightCanPos = 10;
+
+/*
+const int trigPin = 6;
+const int echoPin = 7;
+*/
+
+boolean loaded = false;
+
+void setup()
+{
+
+  Serial.begin(9600);
+
+  leftServo.attach(10);
+  bottomServo.attach(9);
+  rightServo.attach(8);
+
+  leftServo.write(leftCanPos);
+  bottomServo.write(basePos);
+  rightServo.write(rightCanPos);
+  
+  /*
+  pinMode(12,OUTPUT);
+  pinMode(13,OUTPUT);
+  */
+
+}
+
+
+
+void loop()
+{
+
+  if (Serial.available())
+  { //if there is data being recieved
+    blueToothVal = Serial.read(); //read it
+  }
+
+
+
+  switch (blueToothVal) {
+
+    case 'L':
+      if (basePos > 55) {
+        basePos -= 5;
+        bottomServo.write(basePos);
+      }
+      blueToothVal = 'S';
+      break;
+
+    case 'R':
+
+      if (basePos < 125) {
+        basePos += 5;
+        bottomServo.write(basePos);
+      }
+      blueToothVal = 'S';
+      break;
+
+    case 'D':
+      if (leftCanPos > 115) {
+        rightCanPos += 5;
+        leftCanPos -= 5;
+        leftServo.write(leftCanPos);
+        rightServo.write(rightCanPos);
+      }
+      blueToothVal = 'S';
+      break;
+
+    case 'U':
+      if (rightCanPos > 15 && leftCanPos < 175) {
+        rightCanPos -= 5;
+        leftCanPos += 5;
+        leftServo.write(leftCanPos);
+        rightServo.write(rightCanPos);
+      }
+      blueToothVal = 'S';
+      break;
+
+    case 'F':
+      if (loaded == true) {
+        loaded = false;
+        digitalWrite(13,HIGH);
+        delay(2000);
+        digitalWrite(13,LOW);
+        
+      blueToothVal = 'S';
+      break;
+      
+     
+
+    case 'G':
+    
+        loaded = true;
+        leftServo.write(176);
+        bottomServo.write(90);
+        rightServo.write(10);
+        digitalWrite(13,HIGH);
+        delay(2000);
+        digitalWrite(13,LOW);
+        blueToothVal = 'S';
+        break;
+
+
+  }
+  }
+
+}
+
+
+

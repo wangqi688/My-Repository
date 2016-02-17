@@ -1,0 +1,69 @@
+//============================================================================
+// Name        : Template.cpp
+// Author      : 
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include <cstring>
+#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sstream>
+
+using namespace std;
+
+double convertToMph(double mins, double seconds) {
+	return 60 / (mins + (seconds / 60));
+}
+
+double convertToMph(double kph) {
+	return kph / 1.61;
+}
+
+int main() {
+	string stringInput = "";
+
+	while (stringInput != "q") {
+
+		if (cin.fail()) {
+			cin.clear();
+			cin.ignore(1024, '\n');
+			stringInput = "";
+		}
+
+		cout << "Enter time in either of these formats: mins, seconds or kph"
+				<< endl;
+		cout << "type q to quit" << endl;
+
+		getline(cin, stringInput);
+
+		if (stringInput.find(",") != string::npos) {
+
+			string minutes = stringInput.substr(0, stringInput.find(","));
+			string seconds = stringInput.substr(stringInput.find(",") + 2);
+
+			double mins = 0;
+			double secs = 0;
+
+			stringstream(minutes) >> mins;
+			stringstream(seconds) >> secs;
+
+			cout << convertToMph(mins, secs) << " MPH" << endl;
+
+		} else {
+			double kph = 0;
+			stringstream(stringInput) >> kph;
+
+			if (kph >= 0) {
+				cout << convertToMph(kph) <<" MPH"<< endl;
+			}
+		}
+
+	}
+
+	return 0;
+}
+

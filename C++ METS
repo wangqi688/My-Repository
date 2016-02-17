@@ -1,0 +1,77 @@
+//============================================================================
+// Name    	: METS.cpp
+// Author  	: Cedric Holz
+// Description : CS 140 C++
+// Date    	: 1/20/16
+//============================================================================
+
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+using namespace std;
+
+int main() {
+    string activity = "";
+    int mets = 0;
+    int weight = -1;
+    int time = -1;
+
+    while (true) {
+   	 cout << "Enter your activity: sleeping, walking, or basketball" << endl;
+   	 getline(cin, activity);
+
+   	 if (activity == "sleeping") {
+   		 mets = 1;
+   		 break;
+   	 }
+
+   	 if (activity == "walking") {
+   		 mets = 2;
+   		 break;
+   	 }
+
+   	 if (activity == "basketball") {
+   		 mets = 8;
+   		 break;
+   	 }
+   	 cout << "You have entered incorrectly, try again\n" << endl;
+    }
+    cout << "Enter minutes spent spent on activity" << endl;
+
+    while (!(time > 0)) {
+   	 cin >> time;
+   	 if (cin.fail()) {
+   		 cin.clear();
+   		 cin.ignore(1024, '\n');
+   		 time = -1;
+   	 }
+   	 if (!(time > 0)) {
+   		 cout << "You have entered incorrectly, enter the minutes again"
+   				 << endl;
+   	 }
+    }
+
+    cout << "Enter your weight" << endl;
+
+    while (!(weight > 0 && weight < 800)) {
+   	 cin >> weight;
+   	 if (cin.fail()) {
+   		 cin.clear();
+   		 cin.ignore(1024, '\n');
+   		 weight = -1;
+   	 }
+   	 if (!(weight > 0 && weight < 800)) {
+   		 cout << "You have entered incorrectly, enter your weight again"
+   				 << endl;
+   	 }
+    }
+
+    float calories = .0175 * mets * weight * time / 2.2;
+
+    cout << "You have burned " << calories << " calories" << endl;
+
+    return 0;
+}
+
+

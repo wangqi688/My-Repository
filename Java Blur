@@ -1,0 +1,66 @@
+/**
+ * CS 105 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: Instafilter
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+package edu.sbcc.cs105;
+
+import sbccutils.Filterable;
+import sbccutils.Pixel;
+import sbccutils.PixelArray;
+
+/**
+ * Blurs an image
+ * 
+ * @author Cedric Holz
+ *
+ */
+
+public class Blur implements Filterable {
+
+	int height = 0;
+	int width = 0;
+
+	/**
+	 * Takes an average of the pixels around each pixels and replaces the pixel
+	 * with that average of reds and greens and blues.
+	 */
+
+	public PixelArray filter(PixelArray pa) {
+		PixelArray img = pa;
+		this.height = img.getHeight();
+		this.width = img.getWidth();
+		int column;
+		int row = 1;
+		for (column = 1; column < width - 1; column++) {
+			for (row = 1; row < height - 1; row++) {
+
+				// The pixes around the pixel we want to change
+
+				Pixel tl = img.getPixel(row - 1, column - 1);
+				Pixel t = img.getPixel(row - 1, column);
+				Pixel tr = img.getPixel(row - 1, column + 1);
+				Pixel l = img.getPixel(row, column - 1);
+				Pixel r = img.getPixel(row, column + 1);
+				Pixel bl = img.getPixel(row + 1, column - 1);
+				Pixel b = img.getPixel(row + 1, column);
+				Pixel br = img.getPixel(row + 1, column + 1);
+
+				// The average colors around the pixel we want to change
+				int red = (tl.r + t.r + tr.r + l.r + r.r + bl.r + b.r + br.r) / 8;
+				int green = (tl.g + t.g + tr.g + l.g + r.g + bl.g + b.g + br.g) / 8;
+				int blue = (tl.b + t.b + tr.b + l.b + r.b + bl.b + b.b + br.b) / 8;
+
+				img.setPixel(row, column, new Pixel(red, green, blue));
+			}
+		}
+
+		return img;
+	}
+
+}

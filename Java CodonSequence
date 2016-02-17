@@ -1,0 +1,203 @@
+package edu.sbcc.cs105;
+
+import java.util.*;
+
+public class CodonSequence {
+
+	/**
+	 * This class takes in nucleotides, creates a sequence of codons and then
+	 * checks how many protein sequences are inside of the sequence.
+	 */
+
+	int space = 0;
+	boolean starting = true;
+	int start = 0;
+	// A string of codons
+	public ArrayList<String> sequence = new ArrayList<String>();
+
+	// A list of proteinSequences
+	private ArrayList<ProteinSequence> proteinSequences = new ArrayList<ProteinSequence>();
+	String codon = "";
+
+	/**
+	 * Constructor
+	 */
+	public CodonSequence() {
+
+	}
+
+	/**
+	 * Adds nucleotides in series of threes to the sequence
+	 * 
+	 * @param nucleotide
+	 *            A letter to be added to a codon
+	 */
+	public void addNucleotide(String nucleotide) {
+		if (space == 3) {
+			sequence.add(codon);
+			space = 0;
+			codon = "";
+		}
+		codon += nucleotide;
+		space++;
+	}
+
+	/**
+	 * Iterates through the sequence and finds matching start and end codons
+	 * adding a protein sequence to the list of proteinSequences
+	 * 
+	 * @return
+	 */
+	public int findAllProteinSequences() {
+
+		ProteinSequence ps = new ProteinSequence();
+
+		for (int i = 0; i < sequence.size(); i++) {
+			if (sequence.get(i).equals("AUG") || sequence.get(i).equals("GUG") || sequence.get(i).equals("UUG")) {
+				for (int j = i; j < sequence.size(); j++) {
+					if (sequence.get(j).equals("UAA") || sequence.get(j).equals("UAG")
+							|| sequence.get(j).equals("UGA")) {
+						ps.setStartCodonIndex(i);
+						ps.setStopCodonIndex(j);
+						proteinSequences.add(ps);
+					}
+				}
+			}
+		}
+
+		return proteinSequences.size();
+	}
+
+	/**
+	 * Returns a sequence at an index
+	 * 
+	 * @param whichSequence
+	 *            The index
+	 * @return
+	 */
+	public Object ProteinSequence(int whichSequence) {
+		return proteinSequences.get(whichSequence);
+	}
+
+	/**
+	 * prints out the number initial sequence and the amount of protein
+	 * sequences in it.
+	 */
+	public void print() {
+		System.out.println("Number of Sequences : " + findAllProteinSequences());
+		for (int i = 0; i < sequence.size(); i++) {
+			System.out.println(sequence.get(i));
+		}
+
+	}
+}
+---------------------------------------------------------------------------------------------------------
+
+package edu.sbcc.cs105;
+
+public class ProteinSequence {
+
+	private int startCodonIndex;
+	private int stopCodonIndex;
+	/**
+	 * This class is the protein sequence
+	 */
+
+	/**
+	 * Sets the Start Codon.
+	 * 
+	 * @param startIndex
+	 */
+	public void setStartCodonIndex(int startIndex) {
+		startCodonIndex = startIndex;
+	}
+
+	/**
+	 * Sets the Stop Codon
+	 * 
+	 * @param endIndex
+	 */
+	public void setStopCodonIndex(int endIndex) {
+		stopCodonIndex = endIndex;
+	}
+
+	/**
+	 * Gets the Start Codon
+	 * 
+	 * @return
+	 */
+	public int getStartCodonIndex() {
+		return startCodonIndex;
+	}
+
+	/**
+	 * Gets the Stop Codon
+	 * 
+	 * @return
+	 */
+	public int getStopCodonIndex() {
+		return stopCodonIndex;
+	}
+
+}
+---------------------------------------------------------
+
+
+/**
+ * CS 135 Programming Fundamentals
+ * CRN: 38065
+ * Assignment: ProjectName
+ * 
+ * Statement of code ownership: I hereby state that I have written all of this
+ * code and I have not copied this code from any other person or source.
+ * 
+ * @author Cedric Holz
+ */
+
+package edu.sbcc.cs105;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
+public class Main {
+
+	public static void main(String[] args) throws FileNotFoundException {
+
+		CodonSequence cs1 = new CodonSequence();
+		CodonSequence cs2 = new CodonSequence();
+		CodonSequence cs3 = new CodonSequence();
+
+		// First One
+		File newFile = new File("testSequence.txt");
+		String sequence = new Scanner(new File("testSequence.txt")).useDelimiter("\\Z").next();
+
+		Scanner s1 = new Scanner(newFile);
+		while (s1.hasNextLine()) {
+			cs1.addNucleotide(s1.nextLine());
+		}
+		cs1.print();
+
+		System.out.println("\n******\n");
+
+		// Second one
+		String seq2 = sequence.substring(1);
+		Scanner s2 = new Scanner(seq2);
+		while (s2.hasNext()) {
+			cs2.addNucleotide(s2.next());
+		}
+
+		cs2.print();
+
+		System.out.println("\n******\n");
+
+		// Third One
+		String seq3 = seq2.substring(1).trim();
+		Scanner s3 = new Scanner(seq3);
+		while (s3.hasNext()) {
+			cs3.addNucleotide(s3.next());
+		}
+		cs3.print();
+	}
+
+}

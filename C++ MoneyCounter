@@ -1,0 +1,163 @@
+// MoneyCounter.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include<iostream>
+#include "Counter.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string>
+#include <sstream>
+#include <cstring>
+
+using namespace std;
+
+
+int main()
+{
+
+
+	cout << "Enter the size of the counter, a number between 0 and 9999." << endl;
+	int counterSize = 0;
+	while (!(counterSize > 0 && counterSize < 10000)) {
+		cin >> counterSize;
+		cin.clear();
+		cin.ignore(1024, '\n');
+
+		if (!(counterSize > 0 && counterSize < 10000)) {
+			cout << "You have entered incorrectly, enter a number between 0 and 9999"
+				<< endl;
+		}
+	}
+
+
+	Counter c1(counterSize);
+	string input = "";
+	bool done = false;
+
+
+	while (done != true) {
+
+		cout << "Enter a key, either a, s, d, f, followed by 1-9. or o for overflow" << endl;
+		cout << "a->cents, s->dimes, d->dollars, f->tens of dollars" << endl;
+		getline(cin, input);
+
+		string stringNo = input.substr(1, 1);
+		int number = 0;
+		stringstream(stringNo) >> number;
+
+
+		if ((number >= 1 && number <= 9 && input.size()==2) || input[0] == 'q' || input[0] == 'o') {
+			switch (input[0]) {
+			case 'a':
+				c1.incr1(number);
+				cout << c1.getCount() << endl;
+				break;
+			case 's':
+				c1.incr10(number);
+				cout << c1.getCount() << endl;
+				break;
+			case 'd':
+				c1.incr100(number);
+				cout << c1.getCount() << endl;
+				break;
+			case'f':
+				c1.incr1000(number);
+				cout << c1.getCount() << endl;
+				break;
+			case'q':
+				cout << "Quitting" << endl;
+				done = true;
+				break;
+			case 'o':
+				if (c1.overflow() == true) {
+					cout << "You have overflowed" << endl;
+				}
+				else {
+					cout << "There is no overflow" << endl;
+				}
+				break;
+			default:
+				cout << "Invalid Entry" << endl;
+				break;
+			}
+		}
+		else {
+			cout << "Invalid Entry" << endl;
+		}
+
+	}
+}
+
+---------------------------------------------------------------------------------
+
+#include "stdafx.h"
+#include "Counter.h"
+
+
+Counter::Counter() {
+	maxCount = 9999;
+}
+
+Counter::Counter(int inMax) {
+
+	if (inMax <= 9999 && inMax > 0) {
+		maxCount = inMax;
+	}
+}
+
+void Counter::reset() {
+	count = 0;
+}
+
+void Counter::incr1(int multiplier) { //1 cent
+	count += 1* multiplier;
+}
+
+void Counter::incr10(int multiplier) { //10 cents
+	count += 10*multiplier;
+}
+void Counter::incr100(int multiplier) { //1 dollar
+	count += 100 * multiplier;
+
+}
+void Counter::incr1000(int multiplier) { //10 dollars
+	count += 1000 * multiplier;
+}
+
+int Counter::getCount() {
+	return count;
+}
+
+bool Counter::overflow() {
+	if (count > maxCount) {
+		return true;
+	}
+	else
+		return false;
+}
+
+Counter::~Counter()
+{
+}
+---------------------------------------------------------------------------------
+
+#pragma once
+class Counter
+{
+	int maxCount = 0;
+	int count = 0;
+
+public:
+	Counter();
+	Counter(int inCount);
+	int getCount();
+	void reset();
+	void incr1(int multiplier);
+	void incr10(int multiplier);
+	void incr100(int multiplier);
+	void incr1000(int multiplier);
+	bool overflow();
+	~Counter();
+};
+

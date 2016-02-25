@@ -1,0 +1,158 @@
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sstream>
+#include <string>
+#include <cstring>
+#include "Checker.h"
+#include <time.h>
+
+using namespace std;
+
+int main() {
+
+	srand(time(NULL));
+	int intNumber = rand() % 900 + 100;
+	cout<<intNumber<<endl;
+
+	Checker c;
+
+	bool done = false;
+
+	cout << "Please enter a guess" << endl;
+
+	string guess = "";
+
+	while (done != true) {
+
+		int greens = 0;
+		int reds = 0;
+		int yellows = 0;
+		int greenSpots[3] = { 0, 0, 0 };
+		int usedSpots[3] = { 0, 0, 0 };
+
+		getline(cin, guess);
+
+		stringstream ss;
+		ss << intNumber;
+
+		string stringNumber = ss.str();
+
+		//Check Greens
+		greens = c.findGreens(stringNumber, guess, greenSpots);
+
+		//Check Yellows
+		yellows = c.findYellows(stringNumber, guess, greenSpots);
+
+		//Check Reds
+		reds = 3 - (yellows + greens);
+
+		cout << "You have: " << endl;
+		cout << reds << " red" << endl;
+		cout << greens << " green" << endl;
+		cout << yellows << " yellows" << endl;
+
+		if (greens == 3) {
+			cout << "CONGRATULATIONS, YOU ARE CORRECT!!!!!!!" << endl;
+			done = true;
+		}
+
+	}
+
+	return 0;
+}
+
+
+----------------------------------------------------------------
+
+/*
+ * Checker.cpp
+ *
+ *  Created on: Feb 24, 2016
+ *      Author: cpholz
+ */
+
+#include "Checker.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sstream>
+#include <string>
+#include <cstring>
+using namespace std;
+
+Checker::Checker() {
+
+}
+
+Checker::~Checker() {
+}
+
+int Checker::findGreens(string stringNumber, string guess, int *greenSpots) {
+	int i = 0;
+	int greens = 0;
+
+	for (i; i < 3; i++) {
+		if (stringNumber[i] == guess[i]) {
+			greens++;
+			greenSpots[i] = 1;
+
+		}
+	}
+	return greens;
+
+}
+
+int Checker::findYellows(string stringNumber, string guess, int *greenSpots) {
+
+	int yellows = 0;
+	int j = 0;
+	int k = 0;
+
+	for (j=0; j < 3; j++) {
+
+		if (greenSpots[j] == 0) {
+
+			for (k=0; k < 3; k++) {
+
+				if (greenSpots[k] == 0) {
+					if (stringNumber[j] == guess[k]) {
+						yellows++;
+					}
+				}
+
+			}
+
+		}
+	}
+
+	return yellows;
+}
+
+------------------------------------------------------------
+
+
+/*
+ * Checker.h
+ *
+ *  Created on: Feb 24, 2016
+ *      Author: cpholz
+ */
+
+#ifndef CHECKER_H_
+#define CHECKER_H_
+
+#include <string>
+using namespace std;
+
+class Checker {
+	int theNumber = 0;
+public:
+	Checker();
+	int findGreens(string, string, int*);
+	int findYellows(string, string, int*);
+	int findReds(int*);
+	virtual ~Checker();
+};
+
+#endif /* CHECKER_H_ */

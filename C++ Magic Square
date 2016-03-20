@@ -125,7 +125,6 @@ public:
 	Magic();
 	Magic(int);
 	int getMagicConstant();
-	void generateSquare();
 	void display();
 	~Magic();
 };

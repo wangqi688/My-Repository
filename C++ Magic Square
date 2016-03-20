@@ -1,0 +1,132 @@
+#include "stdafx.h"
+#include <iostream>
+#include "Magic.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+#include <iomanip>
+#include <string>
+using namespace std;
+
+
+int main()
+{
+	Magic m1(5);
+	m1.display();
+
+	Magic m2(15);
+	m2.display();
+
+    return 0;
+}
+
+------------------------------------------------------------------------------------
+
+#include "stdafx.h"
+#include "Magic.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+
+using namespace std;
+
+Magic::Magic() {
+}
+
+Magic::Magic(int number) {
+	n = number;
+	magicConstant = n * (pow(n, 2) + 1) / 2;
+	vec = vector<vector<int> >(n, vector<int>(n, 0));
+
+	int i = n / 2;
+	int j = n - 1;
+
+	for (int k = 1; k <= n*n;)
+	{
+		if (i == -1 && j == n)
+		{
+			j = n - 2;
+			i = 0;
+		}
+		else
+		{
+			if (j == n)
+				j = 0;
+			if (i < 0)
+				i = n - 1;
+		}
+		if (vec[i][j])
+		{
+			j -= 2;
+			i++;
+			continue;
+		}
+		else
+			vec[i][j] = k++;
+
+		j++;
+		i--;
+	}
+}
+
+
+void Magic::display() {
+	cout << "MAGIC SQUARE WITH n = "<< n << endl;
+	cout << "Magic Constant = " << magicConstant << endl << endl;
+	for (int i = 0; i<n; i++)
+	{
+		for (int j = 0; j < n; j++) {
+			cout << vec[i][j]<< "  ";
+			string temp;
+			ostringstream os;
+			os << vec[i][j];
+			temp = os.str();
+
+			if (temp.size()==1) {
+				cout << "  ";
+			}
+			if (temp.size() == 2) {
+				cout << " ";
+			}
+			
+
+
+		}
+		cout << endl;
+	}
+}
+
+
+int Magic::getMagicConstant() {
+	return magicConstant;
+}
+
+Magic::~Magic() {
+
+}
+
+----------------------------------------------------------------------------
+
+#pragma once
+#include <vector>
+using namespace std;
+
+class Magic
+{
+	int n = 0;
+	int magicConstant = 0;
+	vector<vector<int> > vec;
+
+public:
+	Magic();
+	Magic(int);
+	int getMagicConstant();
+	void generateSquare();
+	void display();
+	~Magic();
+};
+

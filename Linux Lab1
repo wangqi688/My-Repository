@@ -1,0 +1,26 @@
+#!/bin/bash
+
+
+echo "111111"
+cat -b ~/first
+
+
+echo "222222"
+cat -b $1
+
+
+echo "333333"
+cal $2 $3 
+
+
+echo "444444"
+read -p "Enter your favorite years of all time: " year1 year2
+cal $year1
+sleep 1
+cal $year2
+
+echo "555555"
+read -p "Enter a filename: " filename
+cp -f ~/first ~/$filename
+
+cat -b ~/$filename

@@ -110,7 +110,7 @@ h3="$((0x$d3))"
 
 let output=h1+h2+h3
 
-echo "My hex is "$output
-echo "Real hex is "$((0x3af))
+echo $1 hex = $output decimal
+echo $((0x$1))
 
 ProblemEnd 5

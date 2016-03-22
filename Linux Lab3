@@ -1,0 +1,117 @@
+# CS130 Script Header, Spring 2016
+
+ProblemStart ()
+{
+if [ -f ~/bin/processStart ]; then source ~/bin/processStart $1; fi
+set -o verbose
+}
+
+ProblemEnd ()
+{
+set +o verbose
+read -p "(press Enter) " input
+if [ -f ~/bin/processEnd ]; then source ~/bin/processEnd $1 $input; fi
+}
+
+# force the script to begin running in HOME directory (~)
+cd ~
+echo
+
+# (don't change anything above this line !)
+#----------------------------------------------------------------------
+
+# replace Jimi's name with your name below, using format:  Last, First
+myName="Holz, Cedric"
+echo $myName; echo
+
+echo 1111111111111111111111111111111111111111111111111111111111111111111
+
+ProblemStart 1
+
+echo  "a."
+cat ~/small
+cat ~~/small
+
+echo  "b. Outputting to files"
+cat  ~/small > ~/good
+cat  ~~/small 2> ~/error
+
+echo  "c."
+cat ~/good
+cat ~/error
+
+echo  "d."
+date
+date sdfsdf 2> /dev/null
+
+ProblemEnd 1
+
+echo 2222222222222222222222222222222222222222222222222222222222222222222
+ProblemStart 2
+
+echo "a."
+tr $1 $2 <~/small
+
+echo "b."
+echo "Outputting to file"
+tr  $1 $2 <~/small>~/encoded
+
+echo "c."
+cat ~/encoded
+
+echo "d."
+tr $2 $1 <~/encoded
+
+echo "e. Outputting to file"
+tr $2 $1 <~/encoded>~/decoded
+
+echo "f."
+cat ~/small ~/decoded
+echo "CAN BE DIFFERENT"
+
+echo "g."
+diff ~/small ~/decoded
+ProblemEnd 2
+
+echo 3333333333333333333333333333333333333333333333333333333333333333333
+ProblemStart 3
+
+cat ~/small | sed -e 's/\(.\)/\1 /g' < ~/small | tee  ~/allTeedOff | tr [:lower:] [:upper:] | tac
+cat ~/allTeedOff
+
+ProblemEnd 3
+
+
+echo 4444444444444444444444444444444444444444444444444444444444444444444
+ProblemStart 4
+
+read -p "Input a list of strings separated by whitespace " input
+
+read -p "Now input a delay value in seconds " seconds
+
+rm -f ~/myData
+
+for f in $input
+do
+	echo "$f"
+	date >> ~/myData
+	echo "$f" >> ~/myData
+	sleep $seconds
+done
+
+echo "------------------------------"
+
+cat ~/myData
+
+
+ProblemEnd 4
+
+
+echo 5555555555555555555555555555555555555555555555555555555555555555555
+ProblemStart 5
+
+ls *.c | xargs cp -t ../destination
+
+ProblemEnd 5
+
+

@@ -1,0 +1,116 @@
+# CS130 Script Header, Spring 2016
+
+ProblemStart ()
+{
+if [ -f ~/bin/processStart ]; then source ~/bin/processStart $1; fi
+set -o verbose
+}
+
+ProblemEnd ()
+{
+set +o verbose
+read -p "(press Enter) " input
+if [ -f ~/bin/processEnd ]; then source ~/bin/processEnd $1 $input; fi
+}
+
+# force the script to begin running in HOME directory (~)
+cd ~
+echo
+
+# (don't change anything above this line !)
+#----------------------------------------------------------------------
+
+# replace Jimi's name with your name below, using format:  Last, First
+myName="Holz, Cedric"
+echo $myName; echo
+
+echo 1111111111111111111111111111111111111111111111111111111111111111111
+
+ProblemStart 1
+#a.
+cal | hexdump | head -3 | cat -b > ~/hexy; cat ~/hexy
+
+#b.
+cal | hexdump | head -3 | cat -b > ~/hexy; cat ~/hexy
+
+#c.
+ln ~/hexy cpholzHard
+ln -s ~/hexy cpholzSoft
+
+#d.
+ls -li cpholzHard cpholzSoft ~/hexy
+
+#e.
+ln ~/hexy /tmp/cpholzHard; ln -s ~/hexy /tmp/cpholzSoft
+
+#f.
+df
+
+#g.
+ls -li /tmp/cpholzSoft
+
+#h.
+cat /tmp/cpholzHard /tmp/cpholzSoft
+
+ProblemEnd 1
+
+
+echo 2222222222222222222222222222222222222222222222222222222222222222222
+ProblemStart 2
+#a.
+shopt -s expand_aliases
+alias lmod="ls -lta"
+lmod ~/
+
+#b.
+cd ~/
+alias fileFilter='ls [a-z][-_.][0-9][!0-9]*'
+fileFilter
+
+
+ProblemEnd 2
+
+
+echo 3333333333333333333333333333333333333333333333333333333333333333333
+ProblemStart 3
+#a.
+echo Right now, the value of my \$PWD is $PWD
+
+#b.
+echo "Try \echo 'ps-ef to see more processes"
+
+#c.
+echo Suddenly she exclaimed, \"We\'ll never get out alive\!\"
+
+#d.
+echo This result is$'\n'on two lines
+ProblemEnd 3
+
+
+echo 4444444444444444444444444444444444444444444444444444444444444444444
+ProblemStart 4
+cd ~/
+touch {,1,2}{1..9}Apr{16,17}
+ls {,1,2}{1..9}Apr{16,17}
+echo `ls {,1,2}{1..9}Apr{16,17} -1 | wc -l` months were just displayed
+ProblemEnd 4
+
+
+echo 5555555555555555555555555555555555555555555555555555555555555555555
+ProblemStart 5
+
+input=$1
+d1="${input:0:1}"
+d2="${input:1:1}"
+d3="${input:2:3}"
+
+let h1="$((0x$d1))"*16*16
+let h2="$((0x$d2))"*16
+h3="$((0x$d3))"
+
+let output=h1+h2+h3
+
+echo "My hex is "$output
+echo "Real hex is "$((0x3af))
+
+ProblemEnd 5

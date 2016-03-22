@@ -1,0 +1,62 @@
+#!/bin/bash
+echo"1111111111111111"
+echo -n "My User Name: " ; whoami
+
+echo -n "This Computer: " ; hostname
+
+
+echo -n "Remote Computer: "; hostname
+
+who -H
+
+#exit
+
+pwd
+
+echo "222222222222222222"
+date +"DATE: %A, %B %d, %Y"
+date +"TIME:%l:%M:%S:%P"
+b2 w ~/me 60 ~/controlChars/me
+cat $2
+
+fold -sw $3 $2
+
+echo "33333333333333333333333333333333"
+
+cd ~/
+
+mkdir -p d11/d22/d33
+
+cd d11/d22
+
+cp $2 ~/d11/easy
+
+touch d33/xxx d33/yyy d33/zzz
+
+mv ../easy hard
+
+tree ../
+
+rm -rf ~/d11/d22/d33
+
+tree ~/d11
+
+echo "4444444444444444444444444444444444"
+
+cat -A $4
+od -c $4
+hexdump $4
+
+echo "5555555555555555555555555555555555555555"
+
+
+read -p "Give 3 numbers between 32 and 127 " no1 no2 no3
+
+
+printf "\U$(printf %08x $no1)\n"
+printf "\U$(printf %08x $no2)\n"
+printf "\U$(printf %08x $no3)\n"
+
+
+man -P cat ascii
+

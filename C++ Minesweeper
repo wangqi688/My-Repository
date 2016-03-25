@@ -1,0 +1,177 @@
+//============================================================================
+// Name        : Minesweeper.cpp
+// Author      : 
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sstream>
+#include <string>
+#include <cstring>
+#include <time.h>
+#include <iomanip>
+
+using namespace std;
+int gridSize = 0;
+
+void display(char p[15][15]) {
+	cout << "WEiners";
+}
+
+int main() {
+
+	int difficulty = 0;
+
+	cout << "Enter a difficulty level of 1, 2, or 3" << endl;
+	cin >> difficulty;
+
+	if (difficulty == 1) {
+		gridSize = 7;
+
+	}
+	if (difficulty == 2) {
+		gridSize = 10;
+	}
+	if (difficulty == 3) {
+		gridSize = 15;
+	}
+
+	srand(time((NULL)));
+
+	char underLying[gridSize][gridSize];
+	char shown[gridSize][gridSize];
+
+	for (int i = 0; i < gridSize; i++) {
+		for (int j = 0; j < gridSize; j++) {
+			int rando = rand() % 100 + 1;
+			if (rando <= 20) {
+				underLying[i][j] = '*';
+			} else {
+				underLying[i][j] = '-';
+			}
+			shown[i][j] = '-';
+		}
+	}
+
+	for (int i = 0; i < gridSize; i++) {
+		for (int j = 0; j < gridSize; j++) {
+			int number = 0;
+			if (underLying[i][j] != '*') {
+
+				if (underLying[i - 1][j - 1] == '*') {
+					number += 1;
+				}
+				if (underLying[i][j - 1] == '*') {
+					number += 1;
+				}
+				if (underLying[i + 1][j - 1] == '*') {
+					number += 1;
+				}
+				if (underLying[i - 1][j] == '*') {
+					number += 1;
+				}
+				if (underLying[i + 1][j] == '*') {
+					number += 1;
+				}
+				if (underLying[i - 1][j + 1] == '*') {
+					number += 1;
+				}
+				if (underLying[i][j + 1] == '*') {
+					number += 1;
+				}
+				if (underLying[i + 1][j + 1] == '*') {
+					number += 1;
+				}
+
+				string temp;
+				ostringstream os;
+				os << number;
+				temp = os.str();
+				underLying[i][j] = temp[0];
+			}
+		}
+	}
+
+	cout << " ";
+	for (int k = 0; k < gridSize; k++) {
+		cout << setw(5);
+		cout << k + 1;
+	}
+	cout << endl;
+
+	for (int i = 0; i < gridSize; i++) {
+		cout << i + 1;
+		for (int j = 0; j < gridSize; j++) {
+			cout << setw(5);
+			cout << shown[i][j];
+		}
+		cout << endl;
+	}
+
+	bool done = false;
+	while (!done) {
+		int x = 0;
+		int y = 0;
+		cout << "Enter x coordinate" << endl;
+		cin >> x;
+		cout << "Enter y coordinate" << endl;
+		cin >> y;
+		cout << "(" << x << "," << y << ")" << endl;
+
+		string flag = "";
+		cout << "Flag it? Enter y/n" << endl;
+		cin >> flag;
+
+		cin.clear();
+		cin.ignore(1024, '\n');
+
+		if (flag == "y") {
+			shown[y - 1][x - 1] = 'F';
+		} else {
+			shown[y - 1][x - 1] = underLying[y - 1][x - 1];
+		}
+
+
+		if (shown[y - 1][x - 1] == '*') {
+			cout << "You Lose!" << endl;
+
+			cout << " ";
+			for (int k = 0; k < gridSize; k++) {
+				cout << setw(5);
+				cout << k + 1;
+			}
+			cout << endl;
+			for (int i = 0; i < gridSize; i++) {
+				cout << i + 1;
+				for (int j = 0; j < gridSize; j++) {
+					cout << setw(5);
+					cout << underLying[i][j];
+				}
+				cout << endl;
+			}
+
+			done = true;
+			break;
+		}
+
+		cout << " ";
+		for (int k = 0; k < gridSize; k++) {
+			cout << setw(5);
+			cout << k + 1;
+		}
+		cout << endl;
+		for (int i = 0; i < gridSize; i++) {
+			cout << i + 1;
+			for (int j = 0; j < gridSize; j++) {
+				cout << setw(5);
+				cout << shown[i][j];
+			}
+			cout << endl;
+		}
+	}
+	return 0;
+}

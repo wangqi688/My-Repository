@@ -18,10 +18,6 @@
 using namespace std;
 int gridSize = 0;
 
-void display(char p[15][15]) {
-	cout << "WEiners";
-}
-
 int main() {
 
 	int difficulty = 0;

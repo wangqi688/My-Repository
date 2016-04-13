@@ -1,0 +1,869 @@
+//============================================================================
+// Name        : Poker.cpp
+// Author      : Cedric Holz
+// Version     :
+// Copyright   : Your copyright notice
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include "Card.h"
+#include "Deck.h"
+#include "Hand.h"
+#include "PokerGame.h"
+#include <algorithm>
+
+using namespace std;
+
+int main() {
+
+	//PokerGame Object
+	PokerGame pg;
+
+	//Call to play the game
+	pg.playGame();
+
+	return 0;
+}
+-----------------------------------------------------------------------
+/*
+ * Card.cpp
+ *
+ *  Created on: Apr 6, 2016
+ *      Author: cpholz
+ */
+
+#include "Card.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+using namespace std;
+
+/**
+ * This class is the card. It takes in values for both the rank and suit and then can output a string of what the card is.
+ */
+
+Card::Card() {
+
+}
+
+Card::Card(int inRank, int inSuit) {
+	rank = inRank;
+	suit = inSuit;
+
+}
+
+int Card::getRank() {
+	return rank;
+}
+
+int Card::getSuit() {
+	return suit;
+}
+
+//Gives the card a title based on the card rank and suit
+string Card::toString() {
+	string cardName = "";
+	if (rank >= JACK) {
+		switch (rank) {
+		case JACK:
+			cardName.append("Jack");
+			break;
+		case QUEEN:
+			cardName.append("Queen");
+			break;
+		case KING:
+			cardName.append("King");
+			break;
+		case ACE:
+			cardName.append("Ace");
+			break;
+		}
+	} else {
+		string srank = " ";
+		ostringstream os;
+		os << rank;
+		srank = os.str();
+		cardName.append(srank);
+	}
+	cardName.append(" of ");
+
+	switch (suit) {
+	case SPADES:
+		cardName.append("Spades");
+		break;
+	case HEARTS:
+		cardName.append("Hearts");
+		break;
+	case DIAMONDS:
+		cardName.append("Diamonds");
+		break;
+	case CLUBS:
+		cardName.append("Clubs");
+		break;
+	}
+
+	return cardName;
+}
+
+Card::~Card() {
+	// TODO Auto-generated destructor stub
+}
+
+string cardName = "";
+
+-----------------------------------------------------------------------
+/*
+ * Card.h
+ *
+ *  Created on: Apr 6, 2016
+ *      Author: cpholz
+ */
+
+#ifndef CARD_H_
+#define CARD_H_
+
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+using namespace std;
+
+class Card {
+
+public:
+	//Ranks the card suits from 0-3
+	enum Suit {
+		SPADES, HEARTS, DIAMONDS, CLUBS
+	};
+
+	//Ranks the cards that don't have numbers with numbers;
+	enum Rank {
+		JACK = 11, QUEEN, KING, ACE
+	};
+
+	int rank = 0;
+	int suit = 0;
+
+	Card();
+	Card(int, int);
+	int getRank();
+	int getSuit();
+	string toString();
+
+	virtual ~Card();
+};
+
+#endif /* CARD_H_ */
+
+-----------------------------------------------------------------------
+/*
+ * Deck.cpp
+ *
+ *  Created on: Apr 6, 2016
+ *      Author: cpholz
+ */
+
+#include "Deck.h"
+#include <vector>
+#include <iostream>
+
+/**
+ * This is a deck object. It starts with the 52 cards and can be shuffled and have cards taken from it.
+ */
+
+//When deck is initialized it creates a deck of cards in order starting at 2 and ending at Ace
+Deck::Deck() {
+	int count = 0;
+	for (int i = 2; i <= 14; i++) {
+		for (int j = 0; j <= 3; j++) {
+			Card temp(i, j);
+			cards.push_back(temp);
+			string s = temp.toString();
+			count++;
+		}
+	}
+}
+
+//Checks to see if the Deck is empty
+bool Deck::isEmpty() {
+	if (cards.size() == 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+//Displays the entire deck as it is.
+void Deck::displayDeck() {
+	for (int i = 0; i < cards.size(); i++) {
+		cout << cards[i].toString() << endl;
+	}
+}
+
+//Swaps cards in two places, used for shuffling
+void Deck::swap(int a, int b) {
+	Card temp = cards[a];
+	cards[a] = cards[b];
+	cards[b] = temp;
+}
+
+//Shuffles the deck
+void Deck::shuffle() {
+	for (int i = 51; i > 0; i--) {
+		int j = rand() % (i + 1);
+		swap(i, j);
+	}
+}
+
+Deck::~Deck() {
+	// TODO Auto-generated destructor stub
+}
+
+
+-----------------------------------------------------------------------
+/*
+ * Deck.h
+ *
+ *  Created on: Apr 6, 2016
+ *      Author: cpholz
+ */
+
+#ifndef DECK_H_
+#define DECK_H_
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include "Card.h"
+
+class Deck {
+public:
+	vector<Card> cards;
+	bool isEmpty();
+	void shuffle();
+	void swap(int, int);
+	void displayDeck();
+	Deck();
+	virtual ~Deck();
+};
+
+#endif /* DECK_H_ */
+
+
+
+-----------------------------------------------------------------------
+/*
+ * Hand.cpp
+ *
+ *  Created on: Apr 6, 2016
+ *      Author: cpholz
+ */
+
+#include "Hand.h"
+#include "Card.h"
+#include "Deck.h"
+#include <vector>
+#include <algorithm>
+
+/**
+ * This class is an individual hand can take cards from the deck
+ */
+
+//A hand is created with only the name of the player who owns the deck.
+Hand::Hand(string p) {
+	player = p;
+}
+
+Hand::Hand(Card c1, Card c2, Card c3, Card c4, Card c5) {
+	cardsInHand.push_back(c1);
+	cardsInHand.push_back(c2);
+	cardsInHand.push_back(c3);
+	cardsInHand.push_back(c4);
+	cardsInHand.push_back(c5);
+}
+
+//Takes in a single card from the deck.
+void Hand::getDealt(Deck&d) {
+	cardsInHand.push_back(d.cards.back());
+	d.cards.pop_back();
+}
+
+//Prints out the hand.
+void Hand::displayHand() {
+	for (int i = 0; i < 5; i++) {
+		cout << cardsInHand[i].toString() << endl;
+	}
+	cout << endl;
+}
+
+//Finds the highest card in the hand.
+Card Hand::highCard() {
+	Card highCard = cardsInHand[0];
+
+	for (int i = 1; i < 5; i++) {
+		if (cardsInHand[i].getRank() > highCard.getRank()) {
+			highCard = cardsInHand[i];
+		}
+		if (cardsInHand[i].getRank() == highCard.getRank()) {
+			if (cardsInHand[i].getSuit() > highCard.getSuit()) {
+				cardsInHand[i] = highCard;
+			}
+		}
+	}
+	return highCard;
+}
+
+/**
+ * Takes the hand and sorts it so in descending order so that the pair found will
+ * be the highest pair. Then the pair is saved in a vector.
+ */
+bool Hand::hasPair() {
+	bool has = false;
+	vector<int> ranks;
+	for (int i = 0; i < 5; i++) {
+		ranks.push_back(cardsInHand[i].getRank());
+	}
+
+	sort(ranks.rbegin(), ranks.rend());
+
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			if (j != i) {
+				if (cardsInHand[i].getRank() == cardsInHand[j].getRank()) {
+					has = true;
+					pairCards.push_back(cardsInHand[i]);
+					pairCards.push_back(cardsInHand[j]);
+				}
+			}
+		}
+	}
+	return has;
+}
+
+/**
+ * Goes checks each card against the other cards in the hand to see if there is a pair
+ * then if two match up it has 2 pair
+ */
+bool Hand::hasTwoPair() {
+	bool has = false;
+	int count = 0;
+	for (int i = 0; i < 5; i++) {
+		for (int j = i; j < 5; j++) {
+			if (j != i) {
+				if (cardsInHand[i].getRank() == cardsInHand[j].getRank()) {
+					count++;
+				}
+			}
+		}
+	}
+	if (count >= 2) {
+		has = true;
+	}
+	return has;
+}
+
+/**
+ * Takes each card and checks how many of them are in the hand, if there
+ * are three of it it returns true.
+ */
+
+bool Hand::hasThreeOfAKind() {
+	bool has = false;
+	for (int i = 0; i < 5; i++) {
+		int count = 1;
+		for (int j = 0; j < 5; j++) {
+			if (i != j) {
+				if (cardsInHand[i].getRank() == cardsInHand[j].getRank()) {
+					count++;
+				}
+			}
+			if (count == 3) {
+				has = true;
+			}
+		}
+	}
+	return has;
+}
+
+/**
+ * sorts the hand and starts at the lowest card.
+ * If next card has a rank of 1 more than the card and this happens 4 times we have a straight.
+ */
+
+bool Hand::hasStraight() {
+	bool has = false;
+	vector<int> ranks;
+
+	for (int i = 0; i < 5; i++) {
+		ranks.push_back(cardsInHand[i].getRank());
+	}
+	sort(ranks.begin(), ranks.end());
+	int count = 0;
+
+	for (int j = 0; j < 5; j++) {
+		if (ranks[j + 1] == ranks[j] + 1) {
+			count++;
+		}
+
+		if (count >= 4) {
+			has = true;
+		}
+	}
+
+	return has;
+
+}
+
+/**
+ * Checks to see if every card has the same suit.
+ * If they do then it has a flush.
+ */
+bool Hand::hasFlush() {
+	bool has = false;
+	int count = 0;
+	for (int i = 0; i < 5; i++) {
+		if (cardsInHand[0].getSuit() == cardsInHand[i].getSuit()) {
+			count++;
+		}
+	}
+	if (count == 5) {
+		has = true;
+	}
+
+	return has;
+}
+
+/**
+ * If it has a pair and three of a kind it has a fullhouse.
+ * Just checks with previous functions.
+ */
+bool Hand::hasFullHouse() {
+	bool has = false;
+
+	if (Hand::hasPair() == true && Hand::hasThreeOfAKind() == true) {
+		has = true;
+	}
+
+	return has;
+}
+
+/**
+ * Checks each card against the others and if there are 4 of any then it
+ * will return true.
+ */
+bool Hand::hasFourOfAKind() {
+	bool has = false;
+	for (int i = 0; i < 5; i++) {
+		int count = 0;
+		for (int j = 0; j < 5; j++) {
+			if (i != j) {
+				if (cardsInHand[i].getRank() == cardsInHand[j].getRank()) {
+					count++;
+				}
+			}
+		}
+		if (count == 3) {
+			has = true;
+		}
+	}
+
+	return has;
+}
+
+/**
+ * If the hand has a straight and a flush it has a straight flush.
+ * This just checks both using previous functions.
+ */
+bool Hand::hasStraightFlush() {
+	bool has = false;
+	if (Hand::hasStraight() == true && Hand::hasFlush() == true) {
+		has = true;
+	}
+	return has;
+
+}
+
+/**
+ * Sorts the hand, if the first card is a 10 and it has a straight
+ * then it is a royal flush.
+ */
+bool Hand::hasRoyalFlush() {
+	bool has = false;
+	vector<int> ranks;
+	for (int i = 0; i < 5; i++) {
+		ranks.push_back(cardsInHand[i].getRank());
+	}
+	sort(ranks.begin(), ranks.end());
+
+	if (ranks[0] == 10 && Hand::hasStraight() == true) {
+		has = true;
+	}
+
+	return has;
+}
+
+/**
+ * Gives each hand a value for easy checking who won if no one has the same hand.
+ */
+int Hand::handValue() {
+	int val = 0;
+	bool done = false;
+	while (!done) {
+		done = true;
+		if (Hand::hasRoyalFlush()) {
+			val = 9;
+		} else if (Hand::hasStraightFlush()) {
+			val = 8;
+		} else if (Hand::hasFourOfAKind()) {
+			val = 7;
+		} else if (Hand::hasFullHouse()) {
+			val = 6;
+		} else if (Hand::hasFlush()) {
+			val = 5;
+		} else if (Hand::hasStraight()) {
+			val = 4;
+		} else if (Hand::hasThreeOfAKind()) {
+			val = 3;
+		} else if (Hand::hasTwoPair()) {
+			val = 2;
+		} else if (Hand::hasPair()) {
+			val = 1;
+		} else {
+			break;
+		}
+	}
+	return val;
+}
+
+Hand::~Hand() {
+}
+
+
+-----------------------------------------------------------------------
+/*
+ * Hand.h
+ *
+ *  Created on: Apr 6, 2016
+ *      Author: cpholz
+ */
+
+#ifndef HAND_H_
+#define HAND_H_
+#include "Card.h"
+#include "Deck.h"
+#include <vector>
+#include <string>
+
+class Hand {
+public:
+	vector<Card> cardsInHand;
+
+	//Pair cards to compare two hands that have pairs
+	vector<Card> pairCards;
+	string player = "";
+	Hand(Deck&);
+	Hand (string);
+	Hand(Card, Card, Card, Card, Card);
+	Card highCard();
+	void getDealt(Deck&);
+	bool hasPair();
+	bool hasTwoPair();
+	bool hasThreeOfAKind();
+	bool hasStraight();
+	bool hasFlush();
+	bool hasFullHouse();
+	bool hasFourOfAKind();
+	bool hasStraightFlush();
+	bool hasRoyalFlush();
+	int handValue();
+
+	void displayHand();
+	virtual ~Hand();
+};
+
+#endif /* HAND_H_ */````
+
+-----------------------------------------------------------------------
+/*
+ * PokerGame.cpp
+ *
+ *  Created on: Apr 8, 2016
+ *      Author: cpholz
+ */
+
+#include "PokerGame.h"
+
+/**
+ * This class interacts with the user, deals hands, and determines the winner(s).
+ */
+
+PokerGame::PokerGame() {
+
+	srand (time(NULL));}
+
+void PokerGame::playGame() {
+	vector < string > playerNames;
+	vector < Hand > hands;
+
+	string playing = "";
+	while (playing != "q") {
+		playerNames.clear();
+		hands.clear();
+		cout << "Do you wish to play poker or quit? (p or q)" << endl;
+
+		getline(cin, playing);
+
+		//If q, the game will quit.
+		if (playing == "q") {
+			break;
+		}
+		//If p, the game will play
+		if (playing == "p") {
+
+			Deck d;
+			d.shuffle();
+
+			int players = 0;
+
+			while (players < 2 || players > 5) {
+				cout << "How many players are playing? (up to 5)" << endl;
+				cin >> players;
+				cin.clear();
+				cin.ignore(1024, '\n');
+			}
+
+			//Fills the playerName and hands vectors with each players information.
+			for (int i = 0; i < players; i++) {
+				cout << "Enter player " << i + 1 << "'s name: " << endl;
+				string name = "";
+				getline(cin, name);
+				playerNames.push_back(name);
+				Hand temp(name);
+				hands.push_back(temp);
+			}
+
+			//Deals out cards one by one in a circle to each player.
+			int count = 0;
+			int deals = hands.size() * 5;
+			for (int i = 0; i < deals; i++) {
+				hands[count].getDealt(d);
+				if (count < hands.size() - 1) {
+					count++;
+				} else {
+					count = 0;
+				}
+			}
+
+			//Displays each players hand and determines how many cards to swap and swaps from the deck.
+			for (int i = 0; i < players; i++) {
+				int cardsToSwap = 0;
+				cout << playerNames[i] << ", your hand is:" << endl;
+				hands[i].displayHand();
+				cout << endl;
+
+				cout << "How many cards you would like to swap. (0-5)" << endl;
+				cin >> cardsToSwap;
+				cin.clear();
+				cin.ignore(1024, '\n');
+
+				for (int j = 0; j <= cardsToSwap; j++) {
+					hands[i].cardsInHand.pop_back();
+					j++;
+				}
+
+				for (int k = 0; k <= cardsToSwap; k++) {
+					hands[i].getDealt(d);
+					k++;
+				}
+
+			}
+
+			cout << endl;
+
+			//Determines the best hand the player has and assigns the player a number depending on how good the hand.
+			for (int j = 0; j < players; j++) {
+				cout << playerNames[j] << "'s hand: " << endl;
+				hands[j].displayHand();
+
+				switch (hands[j].handValue()) {
+				case 0:
+					cout << playerNames[j] << " has high card "
+							<< hands[j].highCard().toString() << endl;
+					break;
+				case 1:
+					cout << playerNames[j] << " has a Pair" << endl;
+					break;
+				case 2:
+					cout << playerNames[j] << " has a Two Pair" << endl;
+					break;
+				case 3:
+					cout << playerNames[j] << " has Three Of A Kind" << endl;
+					break;
+				case 4:
+					cout << playerNames[j] << " has a Straight" << endl;
+					break;
+				case 5:
+					cout << playerNames[j] << " has a Flush" << endl;
+					break;
+				case 6:
+					cout << playerNames[j] << " has a Full House" << endl;
+					break;
+				case 7:
+					cout << playerNames[j] << " has Four Of A Kind" << endl;
+					break;
+				case 8:
+					cout << playerNames[j] << " has a Straight Flush" << endl;
+					break;
+				case 9:
+					cout << playerNames[j] << " has a Royal Flush" << endl;
+					break;
+				}
+				cout << endl;
+
+			}
+			cout << endl;
+
+			//Checks to see who is the winner
+			int maxVal = hands[0].handValue();
+			int winner = 0;
+			vector<int> winnerNumbers;
+
+			for (int i = 0; i < players; i++) {
+
+				if (hands[i].handValue() > maxVal) {
+					maxVal = hands[i].handValue();
+					winner = i;
+				}
+
+			}
+			winnerNumbers.push_back(winner);
+
+			//If more than one player has the best hand that isn't 2 pair or high cards, they are all winners!
+			string multipleWinners = playerNames[winner];
+			bool moreThanOne = false;
+
+			for (int i = 0; i < players; i++) {
+				if (i != winner) {
+					if (hands[i].handValue() == hands[winner].handValue()) {
+						moreThanOne = true;
+						multipleWinners.append(" " + playerNames[i]);
+						winnerNumbers.push_back(i);
+					}
+				}
+			}
+
+			/**
+			 * Checks which high card is highest when there are multiple high card winners
+			 */
+			bool multipleHighs = false;
+			int trueWinner = 0;
+			if (moreThanOne == true && hands[winner].handValue() == 0) {
+				multipleHighs = true;
+				for (int i = 1; i < winnerNumbers.size(); i++) {
+					if (hands[trueWinner].highCard().getRank()
+							< hands[winnerNumbers[i]].highCard().getRank()) {
+						trueWinner = i;
+					}
+				}
+
+			}
+
+			/**
+			 * Checks to see which pair is highest when there are multiple pair winners
+			 */
+			bool multiplePairs = false;
+			if (moreThanOne == true && hands[winner].handValue() == 1) {
+				multiplePairs = true;
+				for (int i = 1; i < winnerNumbers.size(); i++) {
+					if (hands[trueWinner].pairCards[0].getRank()
+							< hands[winnerNumbers[i]].pairCards[0].getRank()) {
+						trueWinner = i;
+					}
+				}
+			}
+
+			//If there is only one winner with the same hand that person is the winner
+			if (moreThanOne == false) {
+				cout << playerNames[winner] << " is the winner!" << endl;
+			}
+			//If there are more than one winners that have better cards than pairs or high cards they all win!
+			else if (moreThanOne == true & multipleHighs = false
+					&& multiplePairs == false) {
+				cout << multipleWinners << " are the winners!" << endl;
+			}
+			//If there are multiple high card winners this prints the best high card winner.
+			else if (multipleHighs == true) {
+				cout << playerNames[trueWinner] << " is the winner!" << endl;
+			}
+			//If there are multiple pair card winners this prints the best pair winner.
+			else if (multiplePairs = true) {
+				cout << playerNames[trueWinner] << " is the winner!" << endl;
+			}
+
+		}
+	}
+
+}
+
+PokerGame::~PokerGame() {
+
+}
+
+
+-----------------------------------------------------------------------
+/*
+ * PokerGame.h
+ *
+ *  Created on: Apr 8, 2016
+ *      Author: cpholz
+ */
+
+#ifndef POKERGAME_H_
+#define POKERGAME_H_
+
+#include "Hand.h"
+#include "Card.h"
+#include "Deck.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+class PokerGame {
+public:
+	PokerGame();
+	void playGame();
+	virtual ~PokerGame();
+};
+
+#endif /* POKERGAME_H_ */
+
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------

@@ -1,0 +1,440 @@
+Cedric Holz
+Lab #5
+Linux
+
+#1
+Script started on Tue Apr 19 22:38:31 2016
+root@kali lab5Files$  umask
+0022
+root@kali lab5Files$ umask 0062
+root@kali lab5Files$ touch newFile
+root@kali lab5Files$ mkdir newDirectory
+root@kali lab5Files$ ls -l
+total 28
+-rw-r--r-- 1 root root   19 Apr 19 21:18 listlinks.sh
+-rw-r--r-- 1 root root  289 Apr 19 19:58 mychanges.sed
+-rw-r--r-- 1 root root  147 Apr 19 20:10 names
+-rw-r--r-- 1 root root  147 Apr 19 20:30 names2
+-rw-r--r-- 1 root root  146 Apr 19 20:31 names2Changed
+drwx--xr-x 2 root root 4096 Apr 19 22:38 newDirectory[0m
+-rw----r-- 1 root root    0 Apr 19 22:38 newFile
+-rw-r--r-- 1 root root   36 Apr 19 21:38 search.sh
+lrwxrwxrwx 1 root root    5 Apr 19 21:16 symLink[0m -> names
+-rw-r--r-- 1 root root    0 Apr 19 22:38 typescript
+root@kali lab5Files$  umask 0022
+root@kali lab5Files$  exit
+Exit
+Script done on Tue Apr 19 22:39:01 2016
+
+
+
+
+
+#2
+Script started on Tue Apr 19 22:45:08 2016
+root@kali lab5Files$  echo 'w' > w
+root@kali lab5Files$  echo 'w' > x
+root@kali lab5Files$  echo 'w' > y
+root@kali lab5Files$  echo 'y' > z
+root@kali lab5Files$  cat w x y z
+w
+x
+y
+z
+root@kali lab5Files$  cp w x y z
+cp: target 'z' is not a directory
+root@kali lab5Files$  rm z
+root@kali lab5Files$  mkdir z
+root@kali lab5Files$  cp w x y z
+root@kali lab5Files$  exit
+exit
+Script done on Tue Apr 19 22:46:15 2016
+
+
+
+
+
+#3
+Script started on Tue Apr 19 22:48:39 2016
+
+root@kali lab5Files$  showAll  root@kali lab5Files$  showAll=`ls -a`; echo $showAll
+. .. listlinks.sh mychanges.sed names names2 names2Changed newDirectory newFile search.sh symLink typescript w x y z
+
+root@kali lab5Files$  echo "$showAll"
+.
+..
+listlinks.sh
+mychanges.sed
+names
+names2
+names2Changed
+newDirectory
+newFile
+search.sh
+symLink
+typescript
+w
+x
+y
+Z
+root@kali lab5Files$  exit
+exit
+Script done on Tue Apr 19 22:49:13 2016
+
+
+
+#4
+Script started on Tue Apr 19 22:49:31 2016
+root@kali lab5Files$  echo "top command displays linux processes and the -d100 flag pauses the update by 100 seconds"
+top command displays linux processes and the -d100 flag pauses the update by 100 seconds" 
+
+root@kali lab5Files$  top -d 100
+top - 22:50:07 up  6:18,  1 user,  load average: 0.55, 0.72, 0.76
+Tasks: 205 total,   1 running, 204 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  9.9 us,  1.7 sy,  0.0 ni, 88.1 id,  0.4 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  8083988 total,  4191560 free,  2046100 used,  1846328 buff/cache
+KiB Swap:  1242108 total,  1242108 free,        0 used.  5457856 avail Mem 
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                                                                      
+ 1668 root      20   0 2932032 1.108g  96472 S  25.0 14.4 324:13.74 iceweasel                                                                                    
+ 1249 root       9 -11  575560  12900   9852 S   6.2  0.2  11:01.81 pulseaudio                                                                                   
+ 1262 root      20   0  683156 126624 110540 S   6.2  1.6   9:54.99 Xorg                                                                                         
+    1 root      20   0  121320   5452   3832 S   0.0  0.1   0:01.69 systemd                                                                                      
+    2 root      20   0       0      0      0 S   0.0  0.0   0:00.00 kthreadd                                                                                     
+    3 root      20   0       0      0      0 S   0.0  0.0   0:00.01 ksoftirqd/0                                                                                  
+    5 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/0:0H                                                                                 
+    7 root      20   0       0      0      0 S   0.0  0.0   0:05.72 rcu_sched                                                                                    
+    8 root      20   0       0      0      0 S   0.0  0.0   0:00.00 rcu_bh                                                                                       
+    9 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 migration/0                                                                                  
+   10 root      rt   0       0      0      0 S   0.0  0.0   0:00.06 watchdog/0                                                                                   
+   11 root      rt   0       0      0      0 S   0.0  0.0   0:00.06 watchdog/1                                                                                   
+   12 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 migration/1                                                                                  
+   13 root      20   0       0      0      0 S   0.0  0.0   0:00.02 ksoftirqd/1                                                                                  
+   15 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/1:0H                                                                                 
+   16 root      rt   0       0      0      0 S   0.0  0.0   0:00.06 watchdog/2                                                                                   
+   17 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 migration/2                                                                                  
+   18 root      20   0       0      0      0 S   0.0  0.0   0:00.00 ksoftirqd/2                                                                                  
+   19 root      20   0       0      0      0 S   0.0  0.0   0:00.89 kworker/2:0                                                                                  
+   20 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/2:0H                                                                                 
+   21 root      rt   0       0      0      0 S   0.0  0.0   0:00.06 watchdog/3                                                                                   
+   22 root      rt   0       0      0      0 S   0.0  0.0   0:00.00 migration/3                                                                                  
+   23 root      20   0       0      0      0 S   0.0  0.0   0:00.01 ksoftirqd/3                                                                                  
+   25 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/3:0H                                                                             
+
+root@kali lab5Files$  echo "du command estimates the file usage. -a shows write counts for all files, -s displays only a total for each argument, and -  k makes the block size 1K."
+du command estimates the file usage. -a shows write counts for all files, -s displays only a total for each argument, and -k makes the block size 1K.
+
+root@kali lab5Files$  du
+16    ./z
+4    ./newDirectory
+68    .
+
+root@kali lab5Files$  du -a
+4    ./search.sh
+4    ./z/y
+4    ./z/w
+4    ./z/x
+16    ./z
+0    ./newFile
+4    ./y
+4    ./names2
+4    ./w
+4    ./listlinks.sh
+4    ./mychanges.sed
+4    ./x
+4    ./names2Changed
+4    ./newDirectory
+0    ./symLink
+8    ./typescript
+4    ./names
+68    .
+
+root@kali lab5Files$  du -s
+68    .
+
+root@kali lab5Files$  du -k
+16    ./z
+4    ./newDirectory
+68    .
+
+root@kali lab5Files$  du -ak
+4    ./search.sh
+4    ./z/y
+4    ./z/w
+4    ./z/x
+16    ./z
+0    ./newFile
+4    ./y
+4    ./names2
+4    ./w
+4    ./listlinks.sh
+4    ./mychanges.sed
+4    ./x
+4    ./names2Changed
+4    ./newDirectory
+0    ./symLink
+8    ./typescript
+4    ./names
+68    .
+
+root@kali lab5Files$  du -sk
+68    .
+
+root@kali lab5Files$  echo "df command reports file system disk space usage. -h puts it in human readable format, and -i lists inode information instead of block usage."
+df command reports file system disk space usage. -h puts it in human readable format, and -i lists inode information instead of block usage.
+
+root@kali lab5Files$  df
+Filesystem     1K-blocks    Used Available Use% Mounted on
+udev             4028468       0   4028468   0% /dev
+tmpfs             808400    9564    798836   2% /run
+/dev/sda5       27615100 9846212  16343072  38% /
+tmpfs            4041992    2484   4039508   1% /dev/shm
+tmpfs               5120       0      5120   0% /run/lock
+tmpfs            4041992       0   4041992   0% /sys/fs/cgroup
+tmpfs             808400       8    808392   1% /run/user/133
+tmpfs             808400      20    808380   1% /run/user/0
+
+root@kali lab5Files$  df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            3.9G     0  3.9G   0% /dev
+tmpfs           790M  9.4M  781M   2% /run
+/dev/sda5        27G  9.4G   16G  38% /
+tmpfs           3.9G  2.5M  3.9G   1% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+tmpfs           3.9G     0  3.9G   0% /sys/fs/cgroup
+tmpfs           790M  8.0K  790M   1% /run/user/133
+tmpfs           790M   20K  790M   1% /run/user/0
+
+root@kali lab5Files$  df -i
+Filesystem      Inodes  IUsed   IFree IUse% Mounted on
+udev           1007117    423 1006694    1% /dev
+tmpfs          1010498    724 1009774    1% /run
+/dev/sda5      1762560 337440 1425120   20% /
+tmpfs          1010498     19 1010479    1% /dev/shm
+tmpfs          1010498      4 1010494    1% /run/lock
+tmpfs          1010498     14 1010484    1% /sys/fs/cgroup
+tmpfs          1010498     16 1010482    1% /run/user/133
+tmpfs          1010498     21 1010477    1% /run/user/0
+
+root@kali lab5Files$  exit
+exit
+Script done on Tue Apr 19 22:51:09 2016
+
+
+
+
+
+
+
+#5
+Script started on Tue Apr 19 22:51:16 2016
+root@kali lab5Files$  cal 2016 | sed -f mychanges.sed
+                            2016
+      Janvier                       Gevrier                                  Mars           
+Di Lu Ma Me Je Ve Sa          Di Lu Ma Me Je Ve Sa                 Di Lu Ma Me Je Ve Sa   
+                   1  2                1  2  3  4  5  6                                 1  2  3  4  5   
+  3   4   5   6  7  8   9                    7  8  9 10 11 12 13                                  6  7  8  9  10  11 12   
+10 11 12 13 14 15 16                14 15 16 17 18 19 20                                13 14 15 16 17 18 19   
+17 18 19 20 21 22 23                21 22 23 24 25 26 27                                20 21 22 23 24 25 26   
+24 25 26 27 28 29 30                28 29 27 28 29                                           27 28 29 30 31           
+31                                                                 
+ 
+       Avril                          Mai                               Juin           
+Di Lu Ma Me Je Ve         Sa  Di Lu Ma Me Je Ve        Sa  Di Lu Ma Me Je Ve Sa   
+                1  2                   1  2  3  4  5  6  7                                1  2  3  4   
+      3  4  5  6  7  8  9                 8  9 10 11 12 13 14                             5   6   7  8   9 10 11   
+ 10 11 12 13 14 15 16      15 16 17 18 19 20 21             12 13 14 15 16 17 18   
+17 18 _1_9 20 21 22 23      22 23 24 25 26 27 28             19 20 21 22 23 24 25   
+24 25 26 27 28 29 30          29 30 31                         26 27 28 29 30         
+                                                                   
+ 
+        Juillet                        Aout                          Septembre         
+Di Lu Ma Me Je Ve         Sa  Di Lu Ma Me Je Ve Sa          Di Lu Ma Me Je Ve Sa   
+                1  2                               1  2  3  4  5  6                                    1  2  3   
+ 3   4   5   6   7   8   9           7   8   9  10 11 12 13                   4    5   6   7   8   9 10   
+10 11 12 13 14 15 16         14 15 16 17 18 19 20          11 12 13 14 15 16 17   
+17 18 19 20 21 22 23          21 22 23 24 25 26 27          18 19 20 21 22 23 24   
+24 25 26 27 28 29 30          28 29 30 31                   25 26 27 28 29 30      
+31                                                                 
+ 
+      Octobre                   Novembre                      Decembre         
+Di Lu Ma Me Je Ve         Sa  Di Lu Ma Me Je Ve Sa          Di Lu Ma Me Je Ve Sa   
+                         1                   1  2  3  4  5                                   1  2  3   
+ 2   3   4   5   6   7   8               6  7  8  9 10 11 12             4    5   6   7  8   9 10   
+ 9 10 11 12 13 14 15           13 14 15 16 17 18 19          11 12 13 14 15 16 17   
+16 17 18 19 20 21 22           20 21 22 23 24 25 26          18 19 20 21 22 23 24   
+23 24 25 26 27 28 29           27 28 29 30                   25 26 27 28 29 30 31   
+30 31            
+                                                  
+root@kali lab5Files$  cat mychanges.sed
+s/January/Janvier/g
+s/February/Gevrier/g
+s/March/Mars/g
+s/April/Avril/g
+s/May/Mai/g
+s/June/Juin/g
+s/July/Juillet/g
+s/August/Aout/g
+s/September/Septembre/g
+s/October/Octobre/g
+s/November/Novembre/g
+s/December/Decembre/g
+s/Su/Di/g
+s/Mo/Lu/g
+s/Tu/Ma/g
+s/We/Me/g
+s/Th/Je/g
+s/Fr/Ve/g
+s/Sa/Sa/g
+root@kali lab5Files$  exit
+exit
+Script done on Tue Apr 19 22:51:47 2016
+
+
+
+
+
+#6
+Script started on Tue Apr 19 22:52:21 2016
+
+root@kali lab5Files$  cat names | sort | cat
+Barb Layhey 51
+Bubbles Smith 37
+Cedric Holz 23
+Corey Trevor 24
+Jay Roc 31
+Julian Paul 45
+Lucy Wells 36
+Randy Layhey 37
+Ricky Wells 38
+Sam Losco 34
+
+root@kali lab5Files$  cat names | sort -k2 | cat
+Cedric Holz 23
+Randy Layhey 37
+Barb Layhey 51
+Sam Losco 34
+Julian Paul 45
+Jay Roc 31
+Bubbles Smith 37
+Corey Trevor 24
+Lucy Wells 36
+Ricky Wells 38
+
+root@kali lab5Files$  cat names | sort -k2 | cat
+Cedric Holz 23
+Corey Trevor 24
+Jay Roc 31
+Sam Losco 34
+Lucy Wells 36
+Bubbles Smith 37
+Randy Layhey 37
+Ricky Wells 38
+Julian Paul 45
+Barb Layhey 51
+
+root@kali lab5Files$  cat names | sort -k3 | cat
+Barb Layhey 51
+Julian Paul 45
+Ricky Wells 38
+Randy Layhey 37
+Bubbles Smith 37
+Lucy Wells 36
+Sam Losco 34
+Jay Roc 31
+Corey Trevor 24
+Cedric Holz 23
+root@kali lab5Files$  exit
+exit
+Script done on Tue Apr 19 22:52:47 2016
+
+
+
+
+
+
+
+#7
+Script started on Tue Apr 19 22:52:51 2016
+root@kali lab5Files$  diff names names2
+5c5
+< Ricky Wells 38
+---
+> Ricky Wells 40
+10c10
+< Barb Layhey 51
+---
+> Barb Layhey 54
+
+root@kali lab5Files$  diff names names2Cahanged
+5,7c5,7
+< Ricky Wells 38
+< Julian Paul 45
+< Bubbles Smith 37
+---
+> Ricky Wells 40
+> Julian Rum 45
+> Bubbles Carts 37
+10c10
+< Barb Layhey 51
+---
+> Barb Layhey 54
+root@kali lab5Files$  exit
+exit
+Script done on Tue Apr 19 22:53:15 2016
+
+
+
+
+
+#8
+Script started on Tue Apr 19 22:53:20 2016
+root@kali lab5Files$  cat listlinks.sh
+ls -l | grep '^l'  
+root@kali lab5Files$  bash listlinks.sh
+lrwxrwxrwx 1 root root     5 Apr 19 21:16 symLink -> names
+root@kali lab5Files$  exit
+exit
+Script done on Tue Apr 19 22:53:39 2016
+
+
+#9
+Script started on Tue Apr 19 22:53:44 2016
+root@kali lab5Files$  cat search.sh
+find /etc -name *bash* 2> /dev/null
+root@kali lab5Files$  bash search.sh
+/etc/profile.d/bash_completion.sh
+/etc/bash_completion
+/etc/bash_completion.d
+/etc/bash.bashrc
+/etc/skel/.bash_logout
+/etc/skel/.bashrc
+/etc/skel/.bashrc.original
+root@kali lab5Files$  exit
+exit
+Script done on Tue Apr 19 22:54:00 2016
+
+
+
+
+
+#10
+Script started on Wed Apr 20 17:40:17 2016
+root@kali lab5Files$ cd ~/ 
+root@kali ~$ cat ~/bin/cal.sh
+date +%j; cal; echo "Finally done with SBCC, only two more years of college and I'll see you at work!"
+root@kali ~$ ~/bin/cal/ .sh
+111
+     April 2016        
+Su Mo Tu We Th Fr Sa   
+                 1  2   
+ 3  4  5  6  7  8  9   
+10 11 12 13 14 15 16   
+17 18 19 20 21 22 23   
+24 25 26 27 28 29 30   
+                       
+Finally done with SBCC!
+root@kali ~$ exit
+exit
+
+Script done on Wed Apr 20 17:40:45 2016

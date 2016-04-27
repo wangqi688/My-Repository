@@ -1,0 +1,111 @@
+//============================================================================
+// Name        : Dictionary.cpp
+// Author      : Cedric Holz
+// Version     :
+// Copyright   : 
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include <set>
+#include <locale>
+
+using namespace std;
+
+void display(set<string> s) {
+	for (set<string>::iterator it = s.begin(); it != s.end(); ++it)
+		cout << ' ' << *it << endl;
+	cout << "\n";
+}
+
+string lower(string s) {
+	string lowerCase = "";
+	locale loc;
+	for (string::size_type i = 0; i < s.length(); ++i) {
+		lowerCase += tolower(s[i], loc);
+	}
+	return lowerCase;
+}
+
+int main() {
+
+	fstream words;
+	words.open("wordlist.txt");
+	string line;
+
+	set < string > dict;
+
+	if (words.is_open()) {
+		while (getline(words, line)) {
+			dict.insert(lower(line));
+		}
+	} else
+		cout << "Unable to open file";
+
+	display (dict);
+
+	char input;
+
+	while (input != 'q') {
+		input = 'n';
+		string add = "";
+		string del = "";
+		set<string>::iterator it;
+		string lookFor = "";
+
+		cout
+				<< "Enter a to add a word, d to delete a word, l to look for word, s to show dictionary , or q to quit."
+				<< endl;
+		cin >> input;
+		cin.clear();
+		cin.ignore(1024, '\n');
+
+		switch (input) {
+		case 'a':
+			cout << "Enter word to add" << endl;
+			getline(cin, add);
+			if (dict.count(add)) {
+				cout << "That word is already in the dictionary" << endl;
+			} else {
+				dict.insert(lower(add));
+			}
+			break;
+		case 'd':
+			cout << "Enter word to delete" << endl;
+			getline(cin, del);
+			if (dict.count(del)) {
+				it = dict.find(del);
+				dict.erase(it);
+			} else {
+				cout << "That word is not in the dictionary" << endl;
+			}
+			break;
+		case 'l':
+			cout << "Enter word to look for" << endl;
+			getline(cin, lookFor);
+			if (dict.count(lookFor)) {
+				cout << lookFor << " is in the dictionary" << endl;
+			} else {
+				cout << lookFor << " is not in the dictionary" << endl;
+			}
+
+			break;
+		case 's':
+			display(dict);
+			break;
+		}
+
+		cout << endl;
+
+	}
+
+	words.close();
+	return 0;
+}

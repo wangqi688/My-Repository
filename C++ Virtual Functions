@@ -1,0 +1,259 @@
+//============================================================================
+// Name        : PersonInstructorStudent.cpp
+// Author      : Cedric Holz
+// Version     :
+// Copyright   : 
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include "Person.h"
+#include "Student.h"
+#include "Instructor.h"
+using namespace std;
+
+int main() {
+
+	Person fedor;
+	Instructor sam;
+	Student guilio;
+
+	fedor.setName("Fedor Kostritsa");
+	fedor.setBirthday("November 11, 1992");
+
+	sam.setName("Salmaun Masooman");
+	sam.setBirthday("October 12, 1984");
+	sam.setSalary(90000);
+
+	guilio.setName("Guilio Colleluori");
+	guilio.setBirthday("April 25, 1992");
+	guilio.setMajor("Computer Science");
+
+	fedor.display();
+	sam.display();
+	guilio.display();
+
+	return 0;
+}
+------------------------------------------------------------------------------
+/*
+ * Person.h
+ *
+ *  Created on: Apr 20, 2016
+ *      Author: cpholz
+ */
+
+#ifndef PERSON_H_
+#define PERSON_H_
+using namespace std;
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+class Person {
+public:
+	string name = "";
+	string birthday = "";
+
+	virtual void display();
+
+	void setBirthday(string);
+	void setName(string);
+	Person();
+	virtual ~Person();
+
+};
+
+#endif /* PERSON_H_ */
+
+------------------------------------------------------------------------------
+/*
+ * Person.cpp
+ *
+ *  Created on: Apr 20, 2016
+ *      Author: cpholz
+ */
+
+#include "Person.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+using namespace std;
+
+Person::Person() {
+
+}
+
+void Person::display() {
+	cout << name << endl << birthday << endl << endl;
+	;;
+
+}
+
+void Person::setBirthday(string bday) {
+	birthday = bday;
+}
+
+void Person::setName(string n) {
+	name = n;
+}
+
+Person::~Person() {
+	// TODO Auto-generated destructor stub
+}
+
+
+------------------------------------------------------------------------------
+/*
+ * Instructor.cpp
+ *
+ *  Created on: Apr 20, 2016
+ *      Author: cpholz
+ */
+
+#include "Instructor.h"
+#include "Person.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+Instructor::Instructor() {
+	// TODO Auto-generated constructor stub
+
+}
+
+void Instructor::display() {
+	cout << name << endl << birthday << endl << salary << endl << endl;
+}
+
+void Instructor::setSalary(int s) {
+	salary = s;
+}
+
+Instructor::~Instructor() {
+	// TODO Auto-generated destructor stub
+}
+
+
+------------------------------------------------------------------------------
+/*
+ * Instructor.h
+ *
+ *  Created on: Apr 20, 2016
+ *      Author: cpholz
+ */
+
+#ifndef INSTRUCTOR_H_
+#define INSTRUCTOR_H_
+#include "Person.h"
+#include "Student.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+class Instructor: public Person {
+public:
+	Instructor();
+	int salary = 0;
+	void display();
+	void setSalary(int s);
+
+	virtual ~Instructor();
+};
+
+#endif /* INSTRUCTOR_H_ */
+
+------------------------------------------------------------------------------
+
+/*
+ * Student.cpp
+ *
+ *  Created on: Apr 20, 2016
+ *      Author: cpholz
+ */
+
+#include "Student.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+
+Student::Student() {
+	// TODO Auto-generated constructor stub
+
+}
+
+void Student::setMajor(string m) {
+	major = m;
+}
+
+void Student::display() {
+	cout << name << endl << birthday << endl << major << endl << endl;
+	;
+}
+
+Student::~Student() {
+	// TODO Auto-generated destructor stub
+}
+
+
+------------------------------------------------------------------------------
+
+/*
+ * Student.h
+ *
+ *  Created on: Apr 20, 2016
+ *      Author: cpholz
+ */
+
+#ifndef STUDENT_H_
+#define STUDENT_H_
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include "Person.h"
+
+using namespace std;
+
+class Student: public Person {
+public:
+	string major = "";
+
+	void setMajor(string);
+	void display();
+
+	Student();
+	virtual ~Student();
+};
+
+#endif /* STUDENT_H_ */
+

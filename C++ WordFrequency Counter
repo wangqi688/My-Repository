@@ -1,0 +1,68 @@
+//============================================================================
+// Name        : WorldFrequencyCounter.cpp
+// Author      : Cedric Holz
+// Version     :
+// Copyright   : 
+// Description : Hello World in C++, Ansi-style
+//============================================================================
+
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include <set>
+#include <locale>
+#include <map>
+#include <ctype.h>
+
+using namespace std;
+
+string lower(string s) {
+	string lowerCase = "";
+	locale loc;
+	for (string::size_type i = 0; i < s.length(); ++i) {
+		lowerCase += tolower(s[i], loc);
+	}
+	return lowerCase;
+}
+
+int main() {
+	fstream words;
+	words.open("file.txt");
+	string line;
+	string word;
+
+	map<string, int> wordFreq;
+
+	if (words.is_open()) {
+		while (getline(words, line)) {
+
+			istringstream iss(line);
+			string word;
+			while (iss >> word) {
+				if (ispunct(word[word.length() - 1])
+						|| word[word.length() - 1] == ':') {
+
+					wordFreq[lower(word.substr(0, word.length() - 1))]++;
+				} else {
+					wordFreq[lower(word)]++;
+				}
+			}
+
+		}
+	} else {
+		cout << "Unable to open file";
+	}
+
+	map<string, int>::iterator pos;
+
+	for (pos = wordFreq.begin(); pos != wordFreq.end(); ++pos) {
+		cout << pos->first << " " << pos->second << endl;
+	}
+
+	return 0;
+}

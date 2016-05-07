@@ -5,11 +5,9 @@ echo -n "My User Name: " ; whoami
 echo -n "This Computer: " ; hostname
 
 
-echo -n "Remote Computer: "; hostname
+ssh $1 "echo -n 'Remote Computer:' ; hostname"
 
-who -H
-
-#exit
+ssh $1 "who -H"
 
 pwd
 

@@ -14,7 +14,7 @@ pwd
 echo "222222222222222222"
 date +"DATE: %A, %B %d, %Y"
 date +"TIME:%l:%M:%S:%P"
-b2 w ~/me 60 ~/controlChars/me
+fold w ~/me 60 ~/controlChars/me
 cat $2
 
 fold -sw $3 $2
